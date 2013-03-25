@@ -6,7 +6,7 @@ tnode *root = NULL;
 
 int
 main() {
-	root = init_pbook(root);
+	init_pbook();
 	/* TODO: put a switch here decide
 	 * whether you're client or srv
 	 * if running in daemon mode
