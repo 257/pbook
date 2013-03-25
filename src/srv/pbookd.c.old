@@ -1,0 +1,83 @@
+#include "pbookd.h"
+
+
+void
+pbookd(int mode) {
+	switch (mode) {
+		case START:
+			mk_socket();
+			listen_and_talk_socket();
+			break;
+		case KILL:
+			close(s2);
+			break;
+		default:
+			break;
+}
+
+int
+mk_socket() {
+	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+		perror("socket");
+		exit(1);
+	}
+
+	local->sa_family = AF_UNIX;  /* local is declared before socket() ^ */
+	strcpy(local->sa_data, SOCK_data);
+	/* Notice:
+	 * we call unlink() before bind() 
+	 * to remove the socket if it already exists.
+	 * You will get an EINVAL error if the file is already there.
+	 */
+
+	unlink(local->sa_data);
+	len = strlen(local->sa_data) + sizeof(local->sa_family);
+	if (bind(s, (struct sockaddr *)&local, len) == -1) {
+		perror("bind");
+		exit(1);
+	}
+	if (listen(s, QLEN) == -1) {
+		perror("listen");
+		exit(1);
+	}
+}
+
+void
+linsten_and_talk_socket() {
+	/*
+	 * This will accept a connection from a client.
+	 * This function returns another socket descriptor!
+	 * The old descriptor is still listening for new connections,
+	 * but this new one is connected to the client:
+	 */
+	/*
+	 * When accept() returns,
+	 * the remote variable will be filled
+	 * with the remote side's struct sockaddr_un,
+	 * and len will be set to its length.
+	 * The descriptor s2 is connected to the client,
+	 * and is ready for send() and recv()
+	 */
+	for(;;) {
+		int done, n;
+		printf("\t\nWaiting for a connection...\n\n");
+		t = sizeof(remote);
+		if ((s2 = accept(s, (struct sockaddr *)&remote, &t)) == -1) {
+			perror("accept");
+			exit(1);
+		}
+		printf("Connected.\n");
+		done = 0;
+		do {
+			n = recv(s2, str, 100, 0);
+			if (n <= 0) {
+				if (n < 0) perror("recv");
+				done = 1;
+			}
+			if (!done)
+				if (send(s2, str, n, 0) < 0) {
+					perror("send");
+					done = 1;
+				}
+		} while (!done);
+}
