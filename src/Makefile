@@ -21,11 +21,8 @@ objects       = \
 		fline.o \
 		btree.o \
 		init_pbook.o \
-		ui.o \
-		pbd.o \
+		pbkd.o \
 		pbook.o
-
-SRV_PATH     = srv
 
 pbook:           $(objects)
 	cc -o $(EXENAME) $(objects)
@@ -38,3 +35,5 @@ cgi:            pbook
 .PHONY:         clean
 clean:
 	        -rm $(EXENAME) $(objects)
+cleano:
+	        rm $(objects)

@@ -1,30 +1,66 @@
 #include "btree.h"
 
+char *delim = DELIM;
+
 tnode *
 grow_btree(FILE *dbfp, tnode *root) {
 	char entry[MAX_ENTL];
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
-		if(line2node(entry) != NULL)
-			root = addnode_2root(root, line2node(entry));
+		if(l2node(entry, delim) != NULL)
+			root = addnode_2root(root, l2node(entry, delim));
 	// treeprint(root, PRE);
 	return root;
 }
 
+unsigned short int
+isphon(long long phon) {
+	if ((F_PHON <= phon) && (phon <= S_PHON))
+		return 1;
+	else
+		return 0;
+}
+
+
+unsigned short int
+isop(long long op) {
+	if ((NONE <= op) && (op < BOP))
+		return 1;
+	else
+		return 0;
+}
+
+
 tnode *
-line2node(char *line) {
+l2node(char *l, char *delim) {
 	tnode *node = NULL;
 	char name[MAXNAME];
 	char last[MAXNAME];
-	char phon[MAXNAME];
+	long long phon = NONE;
 	char *tokenp;
-	int i = PHON;
-	if (isdigit(line[0])) {
-		for(tokenp = strtok(line, ":");
+	int i  = OP;
+	long long op = NONE;
+	if (isdigit(l[0])) {
+		for(tokenp = strtok(l, delim);
 				tokenp != NULL && i <= LAST;
-				i++, tokenp = strtok(NULL, ":")) {
+				i++, tokenp = strtok(NULL, delim)) {
 			switch (i) {
+				case OP:
 				case PHON:
-					strcpy(phon, tokenp);
+					op = atoll(tokenp);
+					/* every input goes
+					 * through this point
+					 * or does it?
+					 * so we check for sanity
+					 * once and for all here
+					 */
+					if (isphon(op)) {
+						phon = op;
+						i++;
+						op = NONE;
+					} else if (isop(op))
+						;
+					else
+						return NULL;
 					break;
 				case NAME:
 					strcpy(name, tokenp);
@@ -37,7 +73,8 @@ line2node(char *line) {
 					break;
 			}
 		}
-		node = mk_node(node, phon, name, last, HITS);
+		/* TODO: TOASK: is the cast here called for? */
+		node = mk_node(node, (unsigned short) op, phon, name, last, HITS);
 	}
 	return  node;
 }
@@ -106,7 +143,13 @@ ins_node(tnode *root, tnode *node) {
 	}
 	return 0;
 }
-/* TODO: make another struct for q to hold hits' nodes */
+
+/* TODO: caller has to make sure lookup
+ * is handed a q node with
+ * q->op == LOOKUP
+ * for invetory reasons
+ */
+
 tnode *
 lookup(tnode *root, tnode *q) {
 	int cond;
@@ -115,14 +158,13 @@ lookup(tnode *root, tnode *q) {
 	 * printf("lookup: tree\n");
 	 */
 	if (root == NULL) {
-		q = mk_node(root, NULL, NULL, NULL, q->count);
-		/* CLEANUP:
-		 * q = mk_node(root, root->phon, root->name, root->last, q->count);
-		 */
+		q = mk_node(root, LOOKUP, NONE, NULL, NULL, q->count);
 		return q;
-	} else if ((cond = strcmp(q->name, root->name)) == 0) { /* got a hit, keep track */
+		/* ishit? keep track */
+	} else if ((cond = strcmp(q->name, root->name)) == 0) {
 		q->count++;
-		if ((cond = strcmp(q->last, root->last)) == 0) { /* got a match return */
+		/* ismatch? return */
+		if ((cond = strcmp(q->last, root->last)) == 0) {
 			return (q = root);
 		} else if (cond < 0)
 			return lookup(root->left, q);
@@ -141,13 +183,13 @@ update_node(tnode *root, tnode *node) {
 	q = lookup(root, q);
 	switch (q->count) {
 		case HITS:
-			if (strcmp(node->phon, q->phon) == 0) {
+			if (node->phon == q->phon) {
 				printf("the phone number you ");
 				printf("entered is the _same_ ");
 				printf("as the one on the record\n");
 				printf("\nno update is required.\n\n");
 			} else {
-				q->phon = strdup(node->phon);
+				q->phon = node->phon;
 				printf("\nrecord has been updated for:\t%s %s\n\n", node->last, node->name);
 			}
 			return q;
@@ -185,19 +227,24 @@ treeprint(tnode *root, int order) {
 }
 void
 node_printf(tnode *node) {
+	char phon[MAXNAME];
+	char *phonp = phon;
 	printf("%s:%s:%s\n",
-	node_print(node, PHON),
-	node_print(node, NAME),
-	node_print(node, LAST));
+	nodef_print(node, phonp, PHON),
+	nodef_print(node, NULL, NAME),
+	nodef_print(node, NULL, LAST));
 }
 
 char *
 node2line(tnode *node) {
 	char l[MAX_ENTL];
 	char *lp = l;
-	strcpy(lp, node_print(node, PHON));
-	strcat(lp, node_print(node, NAME));
-	strcat(lp, node_print(node, LAST));
+	char phon[MAXNAME];
+	char *phonp = phon;
+	// itoa(nodef_print(node, PHON));
+	strcpy(lp, nodef_print(node, phonp, PHON));
+	strcat(lp, nodef_print(node, NULL, NAME));
+	strcat(lp, nodef_print(node, NULL, LAST));
 	return lp;
 }
 void
@@ -226,78 +273,94 @@ tree_fprintf(tnode *root, int order, FILE *dbfp) {
 }
 void
 node_fprintf(tnode *node, int order, FILE *dbfp) {
+	char phon[MAXNAME];
+	char *phonp = phon;
 	switch (order) {
 		case IN:
-			fprintf(dbfp, "%*s\t%*s\t%*s\n", /* TODO: pass DELIM to fprintf */
+			fprintf(dbfp, "%*s\t%*s\t%*s\n",
 					MAXNAME,
-			node_print(node, NAME),
+			nodef_print(node, NULL, NAME),
 					MAXNAME,
-			node_print(node, LAST),
+			nodef_print(node, NULL, LAST),
 					MAXNAME,
-			node_print(node, PHON));
+			nodef_print(node, phonp, PHON));
 			break;
 		default:
 			fprintf(dbfp,"%s:%s:%s\n",
-			node_print(node, PHON),
-			node_print(node, NAME),
-			node_print(node, LAST));
+			nodef_print(node, phonp, PHON),
+			nodef_print(node, NULL, NAME),
+			nodef_print(node, NULL, LAST));
 			break;
 	}
 }
-/*
-void tree_fwrite(tnode *root, int order, FILE *datafile) {
-	if (root != NULL) {
-		switch (order) {
-			case PRE:
-				node_fwrite(root, datafile);
-				tree_fwrite(root->left, order);
-				tree_fwrite(root->right, order);
-				break;
-			case IN:
-				tree_fwrite(root->left, order);
-				node_fwrite(root, datafile);
-				tree_fwrite(root->right, order);
-				break;
-			case POST:
-				tree_fwrite(root->left, order);
-				tree_fwrite(root->right, order);
-				node_fwrite(root, datafile);
-				break;
-			default:
-				break;
-		}
-	}
-}
-void
-node_fwrite(FILE *datafile, tnode *node) {
-	fwrite(node->phon, sizeof(node->phon), srtlen(node->phon), datafile),
-	fwrite("DELIM", sizeof("DELIM"), 1, datafile),
-	fwrite(node->name, sizeof(node->name), srtlen(node->name), datafile),
-	fwrite("DELIM", sizeof("DELIM"), 1, datafile),
-	fwrite(node->last, sizeof(node->last), srtlen(node->last), datafile),
-	fwrite('\n', sizeof('\n'), 1, datafile),
-	fwrite('\0', sizeof('\0'), 1, datafile),
-}
-*/
+
 void
 hit_print(tnode *node) {
 	printf("%d\n", node->count);
 }
+
+char *utoa(unsigned long long value, char *digits, int base)
+{
+    char *s, *p;
+
+    s = "0123456789abcdefghijklmnopqrstuvwxyz"; /* don't care if s is in
+                                                 * read-only memory
+                                                 */
+    if (base == 0)
+        base = 10;
+    if (digits == NULL || base < 2 || base > 36)
+        return NULL;
+    if (value < (unsigned) base) {
+        digits[0] = s[value];
+        digits[1] = '\0';
+    } else {
+        for (p = utoa(value / ((unsigned)base), digits, base);
+             *p;
+             p++);
+        utoa( value % ((unsigned)base), p, base);
+    }
+    return digits;
+}   
+
+char *itoa(long long value, char *digits, int base)
+{
+    char *d;
+    unsigned long long u; /* assume unsigned is big enough to hold all the
+                           * unsigned values -x could possibly be -- don't
+                           * know how well this assumption holds on the
+                           * DeathStation 9000, so beware of nasal demons
+                           */
+
+    d = digits;
+    if (base == 0)
+        base = 10;
+    if (digits == NULL || base < 2 || base > 36)
+        return NULL;
+    if (value < 0) {
+        *d++ = '-';
+        u = -value;
+    } else
+        u = value;
+    utoa(u, d, base);
+    return digits;
+}
+
 /* broken i know, would have been a nice analogy */
 char *
-node_print(tnode *node, int prm) {
+nodef_print(tnode *node, char *phon, int prm) {
 	if (node->name != NULL)
 		switch (prm) {
 			case PHON:
-				return node->phon;
+				phon = itoa(node->phon, phon, 10);
+				return phon;
 				break;
 			case NAME:
 				return node->name;
 				break;
 			/*
 			case NAME_PHON:
-				node_print(node, NAME);
-				node_print(node, PHON);
+				nodef_print(node, NAME);
+				nodef_print(node, PHON);
 				break;
 				*/
 			case LAST:
@@ -305,16 +368,16 @@ node_print(tnode *node, int prm) {
 				break;
 			/*
 			case LAST_PHON:
-				node_print(node, LAST);
-				node_print(node, PHON);
+				nodef_print(node, LAST);
+				nodef_print(node, PHON);
 				break;
 			case LAST_NAME:
-				node_print(node, LAST);
-				node_print(node, NAME);
+				nodef_print(node, LAST);
+				nodef_print(node, NAME);
 				break;
 			case ALL:
-				node_print(node, LAST_NAME);
-				node_print(node, PHON);
+				nodef_print(node, LAST_NAME);
+				nodef_print(node, PHON);
 				break;
 				*/
 			default:
@@ -326,13 +389,14 @@ node_print(tnode *node, int prm) {
 }
 
 tnode *
-mk_node(tnode *node, char *ph, char *n, char *l, int h) {
-	node = talloc();
-	(ph != NULL) ? (node->phon = strdup(ph)) : (node->phon = ph);
-	(n  != NULL) ? (node->name = strdup(n))  : (node->name = n) ;
-	(l  != NULL) ? (node->last = strdup(l))  : (node->last = l) ;
-	node->count = h;
-	node->left  = node->right = NULL;
+mk_node(tnode *node, unsigned short op, long long ph, char *n, char *l, int count) {
+	node         = talloc();
+	node->op     = op;
+	node->phon   = ph; /* we don't care about BPHN, caller's job */
+	node->count  = count;
+	node->left   = node->right = NULL;
+	(n  != NULL) ? (node->name = strdup(n))  : (node->name = n)    ;
+	(l  != NULL) ? (node->last = strdup(l))  : (node->last = l)    ;
 	return node;
 }
 

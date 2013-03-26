@@ -1,5 +1,6 @@
 #ifndef INIT_PBOOK_H
 #define INIT_PBOOK_H
+
 #include "pb_fs.h"
 #include "btree.h"
 
@@ -13,6 +14,5 @@ extern char  *uinit_pbook(tnode *);
 
 
 extern FILE *dbfp;
-extern tnode *root;
 
 #endif
