@@ -6,7 +6,7 @@ tnode *root = NULL;
 
 int
 main() {
-	init_pbook();
+	root = init_pbook(root);
 	/* TODO: put a switch here decide
 	 * whether you're client or srv
 	 * if running in daemon mode
@@ -14,8 +14,8 @@ main() {
 	 */
 	treeprint(root, PRE);
 	// init_ui(root);
-	// pbookd(START);
-	// pbookd(KILL);
+	// pbkd(START);
+	// pbkd(KILL);
 	uinit_pbook(root);
 	return 0;
 }

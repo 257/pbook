@@ -28,11 +28,10 @@ enum mode { START, KILL };
 struct sockaddr_un local, remote;
 
 
-enum op { LOOKUP, UPDATE };
 
-extern void   pbookd(int);
+extern void   pbkd(int);
 extern void   mk_socket(void);
-extern void   recv_send_2pbc(void);
+extern void   recv_send_2pbkc(void);
 extern int    parse_op(tnode *);
 extern char * do_treeop(tnode *, tnode *, int);
 /* extern int    talk2socket(void); */

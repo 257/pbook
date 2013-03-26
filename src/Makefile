@@ -37,4 +37,4 @@ cgi:            pbook
 
 .PHONY:         clean
 clean:
-	        rm $(EXENAME) $(objects)
+	        -rm $(EXENAME) $(objects)

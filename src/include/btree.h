@@ -7,6 +7,7 @@
 
 enum order { PRE, IN, POST };
 enum hit   { NOHITS, HITS };
+enum op    { LOOKUP, INS, UPDATE };
 enum filed {
 	PHON = 1 /* for perm */,
 	NAME,
@@ -23,6 +24,7 @@ struct tnode {                    /* the tree node: */
 	char *last;
 	char *phon;
 	int count;                /* number of occurrences */
+	int op;                   /* operation directive */
 	tnode *left;              /* left child */
 	tnode *parent;            /* parent for proper deletion but notime */
 	tnode *right;             /* right child */

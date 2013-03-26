@@ -1,8 +1,9 @@
-#include "pbookd.h"
+#include "pbkc.h"
 
-int main(void)
+pbkc(void)
 {
-    int s, t, len;
+    int s, len;
+    socklen_t t;
     struct sockaddr_un remote;
     char str[MAX_QUERYS_LEN];
 
@@ -23,25 +24,23 @@ int main(void)
     }
 
     /* TODO: write to log file */
-    printf("Connected.\n");
-
-    while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
-        if (send(s, str, strlen(str), 0) == -1) {
-            perror("send");
-            exit(1);
-        }
-
-        if ((t=recv(s, str, 100, 0)) > 0) {
-            str[t] = '\0';
-            printf("echo> %s\n", str);
-        } else {
-            if (t < 0) perror("recv");
-            else printf("Server closed connection\n");
-            exit(1);
-        }
+    printf("pbkc:\tConnected.\n");
+    
+    if (send(s, str, strlen(str), 0) == -1) {
+	    perror("send");
+	    exit(1);
     }
-
+    if ((t=recv(s, str, 100, 0)) > 0) {
+	    str[t] = '\0';
+	    printf("echo> %s\n", str);
+    } else {
+	    if (t < 0) perror("recv");
+	    /* TODO: write to log file */
+	    else printf("pbkc:\tServer closed connection\n");
+	    exit(1);
+    }
+    
     close(s);
-
+    
     return 0;
 }

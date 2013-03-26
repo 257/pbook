@@ -7,7 +7,7 @@
 enum { RB = 1, WB };
 
 extern int load_pbook(char *, int);
-extern void init_pbook(void);
+extern tnode *init_pbook(tnode *);
 extern char  *uinit_pbook(tnode *);
 
 

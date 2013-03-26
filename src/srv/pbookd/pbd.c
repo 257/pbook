@@ -6,7 +6,7 @@ int s, s2;
 
 /* backgroud mode, needs signal() */
 void
-pbookd(int mode) {
+pbkd(int mode) {
 	int c;
 		switch (mode) {
 			case START:

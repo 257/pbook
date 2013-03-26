@@ -5,13 +5,14 @@ char *datafile;
 
 FILE  *dbfp;
 
-void
-init_pbook(void) {
+tnode *
+init_pbook(tnode *root) { /* this root will ``shadow'' global root */
 	//load_pbook(datafile, RB)
 	datafile = fs_house_keeping();
 	dbfp = fopen(datafile, "r");
 	root = grow_btree(dbfp, root);
 	fclose(dbfp);
+	return root;
 }
 /* TODO: return int for debug */
 char *
