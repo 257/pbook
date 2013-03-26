@@ -35,7 +35,7 @@ extern void         ugrow_btree(tnode *, FILE *);
 extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
 extern unsigned int ins_node(tnode *, tnode *);
-extern tnode        *mk_node(tnode *, char *, char *, char *, int);
+extern tnode        *mk_node(tnode *, char *, char *, char *, int count, int op);
 extern tnode        *lookup(tnode *, tnode *);
 extern int          fgetline(FILE *fp, char line[], int max);
 extern void         treeprint(tnode *, int);
