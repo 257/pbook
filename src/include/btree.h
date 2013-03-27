@@ -60,6 +60,8 @@ extern char  *      node2line(tnode *);
 extern tnode *      l2node(char *l, char *);
 extern tnode *      update_node(tnode *, tnode *);
 unsigned short int  isop(long long);
+extern char  *      mk_btreel(char *l, const int op, const char *phon, const char *name, const char *last);
+
 /* http://users.powernet.co.uk/eton/kandr2/krx412.html */
 char *utoa(unsigned long long value, char *digits, int base);
 char *itoa(long long value, char *digits, int base);

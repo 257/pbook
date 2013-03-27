@@ -12,7 +12,26 @@ grow_btree(FILE *dbfp, tnode *root) {
 	return root;
 }
 
-
+char *
+mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last) {
+	switch (op) {
+		case LOOKUP:
+			l = strcpy(l, "1");
+			break;
+		case UPDATE:
+			l = strcpy(l, "3");
+			break;
+		default:
+			break;
+	}
+	l = strcat(l, delim);
+	l = strcat(l, phon);
+	l = strcat(l, delim);
+	l = strcat(l, name);
+	l = strcat(l, delim);
+	l = strcat(l, last);
+	return l;
+}
 
 tnode *
 l2node(char *l, char *delim) {
