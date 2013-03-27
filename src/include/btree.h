@@ -2,9 +2,8 @@
 #define BTREE_H
 
 #define DELIM     ":"
-#define S_PHON    10000000000
-#define F_PHON    1000000000
 
+#include "pb_limits.h"
 #include "pb_line.h"
 
 enum order { PRE, IN, POST };
@@ -60,7 +59,6 @@ extern char  *       nodef_print(tnode *, char *, int);
 extern char  *      node2line(tnode *);
 extern tnode *      l2node(char *l, char *);
 extern tnode *      update_node(tnode *, tnode *);
-unsigned short int  isphon(long long);
 unsigned short int  isop(long long);
 /* http://users.powernet.co.uk/eton/kandr2/krx412.html */
 char *utoa(unsigned long long value, char *digits, int base);

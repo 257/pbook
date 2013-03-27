@@ -30,7 +30,7 @@ char *cgigetval(char *fieldname)
 		else
 			len2 = strlen(p);
 		
-		if(p2 == NULL || p3 != NULL && p2 > p3)
+		if((p2 == NULL || p3 != NULL) && (p2 > p3))
 		{
 			/* no = present in this field */
 			p3 += len2;

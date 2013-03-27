@@ -17,6 +17,7 @@ EXENAME       = pbook
 
 include_dirs  = ./include
 objects       = \
+		pb_limits.o \
 		fs.o \
 		fline.o \
 		btree.o \
