@@ -1,3 +1,4 @@
+#include "xctod.h"
 static int xctod(int);
 
 char *unescstring(char *src, int srclen, char *dest, int destsize)

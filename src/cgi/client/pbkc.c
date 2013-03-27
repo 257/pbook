@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "pb_skt.h"
+#include "skt.h"
 #include "cgigetval.h"
 #include "btree.h"
 #include "html.h"
 
 /* only thing we need from btree.h, so far */
 /* TODO: there is more define delim */
-enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
+// enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
 
 extern char *cgigetval(char *);
 
@@ -25,6 +25,7 @@ extern char *cgigetval(char *);
  * crap like ":" in it.
  */
 
+int
 main()
 {
 	html_header("pbook");
@@ -44,6 +45,11 @@ main()
 	last = cgigetval("last");
 	phon = cgigetval("phon");
 
+	op   = "Lookup";
+	name = "name";
+	last = "last";
+	phon = "phon";
+
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now
 	 * but that needs a shared memory implementation
@@ -57,12 +63,13 @@ main()
 	else if(last == NULL) {
 		printf("You didn't enter any last name!\n");
 	} else if(op != NULL && strcmp(op , "Lookup") == 0) {
-		qstrp = mk_btreel(qstrp, LOOKUP, phon, name, last);
-		qstrp = send_recv_2pkd(qstrp);
+		qstrp = mk_btreel(qstrp, delim, LOOKUP, phon, name, last);
+		printf("%s\n", qstrp);
+		qstrp = send_recv_2pbk_skt(qstrp);
 		// TODO: need wrapper here to print fields
 	} else if(op != NULL && strcmp(op, "Update") == 0) {
-		qstrp = mk_btreel(qstrp, UPDATE, phon, name, last);
-		send_recv_2pkd(qstrp);
+		qstrp = mk_btreel(qstrp, delim, UPDATE, phon, name, last);
+		send_recv_2pbk_skt(qstrp);
 	}
 	else {
 		printf("something's wrong!\n");

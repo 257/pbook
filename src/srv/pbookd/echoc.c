@@ -5,15 +5,21 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <unistd.h>
+
+#include "pbook_limits.h"
 
 #define SOCK_PATH "echo_socket"
 
-int main(void)
+#define MAX_Q_LEN ((3*MAXNAME) + 2 + 1) /* 3 fields, 2 FS, \0 */
+
+enum op { ADD, UPDATE };
+char qstr[MAX_Q_LEN];
+
+char *
+send_recv_2pbkd(int op, char *phon, char *name, char *last)
 {
     int s, t, len;
     struct sockaddr_un remote;
-    char str[100];
 
     if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         perror("socket");
@@ -32,23 +38,25 @@ int main(void)
 
     printf("Connected.\n");
 
-    while(printf("> "), fgets(str, 100, stdin), !feof(stdin)) {
-        if (send(s, str, strlen(str), 0) == -1) {
+    (op == UPDATE) ? strcpy(qstr, phon) : strcpy(qstr, "!phon");
+    strcat(qstr, ":");
+    strcat(qstr, name);
+    strcat(qstr, ":");
+    strcat(qstr, last);
+
+    if (send(s, qstr, strlen(q), 0) == -1) {
             perror("send");
             exit(1);
         }
-
-        if ((t=recv(s, str, 100, 0)) > 0) {
-            str[t] = '\0';
-            printf("echo> %s\n", str);
-        } else {
-            if (t < 0) perror("recv");
-            else printf("Server closed connection\n");
-            exit(1);
-        }
+    if ((t=recv(s, qstr, 100, 0)) > 0) {
+	    qstr[t] = '\0';
+	    // TODO: take this out when you're done
+	    printf("%s\n", qstr);
+	    return qstr;
+    } else {
+	    if (t < 0) perror("recv");
+	    else printf("Server closed connection\n");
+	    exit(1);
     }
-
     close(s);
-
-    return 0;
 }

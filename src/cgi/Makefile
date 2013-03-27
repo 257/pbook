@@ -1,37 +1,32 @@
 VPATH          = $(wildcard ./*)
 SUBDIRS        = .
 
-modules        = fs
-modules       += :btree
-modules       += :init
-modules       += :ui
-modules       += :main
-
 MAKEFLAGS      = --no-print-directory
 PREFIX        := $(PWD)
 CFLAGS         = -I$(include_dirs) \
 		-g \
 		-Wall
 
-EXENAME       = pbook
+EXENAME       = pbkc
 
-include_dirs  = ./include
+include_dirs  = ../include
 objects       = \
-		pb_limits.o \
-		fs.o \
 		fline.o \
+		pb_limits.o \
 		btree.o \
-		init_pbook.o \
-		pbkd.o \
-		pbook.o
+		cgigetval.o \
+		pbkc.o \
+		sktc.o \
+		htmlf.o \
+		xctod.o
 
-pbook:           $(objects)
-#cc -o $(EXENAME) $(objects)
-
-SRV_PATH      = ./srv
-pbkd:
-	$(MAKE) -C $(SRV_PATH)
+pbkc:           $(objects)
+	cc -o $(EXENAME) $(objects) && $(MAKE) -C . cleano
 	
+	
+
+cgi:            pbook
+	cp pbook pbook.cgi
 
 .PHONY:         clean cleano distclean
 clean:

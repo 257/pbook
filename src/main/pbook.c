@@ -15,7 +15,7 @@ main() {
 	treeprint(root, PRE);
 	// init_ui(root);
 	pbkd(START);
-	pbkd(KILL);
+	// pbkd(KILL);
 	treeprint(root, PRE);
 	uinit_pbook(root);
 	return 0;
