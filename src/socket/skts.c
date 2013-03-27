@@ -13,8 +13,27 @@ mk_socket() {
 void
 recv_send_2pbk_skt() {
 	socklen_t t;
+	struct sockaddr_un local, remote;
 	char str[MAX_QUERYS_LEN] = {0};
 	char *strp = str;
+	int s;
+
+	s = mk_socket();
+	
+	local.sun_family = AF_UNIX;
+	strcpy(local.sun_path, SOCK_PATH);
+	unlink(local.sun_path);
+	len = strlen(local.sun_path) + sizeof(local.sun_family);
+
+	if (bind(s, (struct sockaddr *)&local, len) == -1) {
+		perror("bind");
+		exit(1);
+	}
+
+	if (listen(s, MAX_Q_LEN) == -1) {
+		perror("listen");
+		exit(1);
+	}
 	/*
 	 * This will accept a connection from a client.
 	 * This function returns another socket descriptor!
@@ -23,6 +42,7 @@ recv_send_2pbk_skt() {
 	 */
 	for(;;) {
 		int done, n, s2;
+		printf("SOCK_PATH:\t%s\n", SOCK_PATH);
 		printf("\t\nWaiting for a connection...\n");
 		t = sizeof(remote);
 		/*
@@ -58,8 +78,10 @@ recv_send_2pbk_skt() {
 
 char *
 parse_op(char *buf) {
+	printf("buf: %s\n", buf);
 	tnode *qnode = NULL;
 	qnode = l2node(buf, delim);
+	node_printf(qnode);
 	switch (qnode->op) {
 		case UPDATE:
 			qnode = update_node(root, qnode);

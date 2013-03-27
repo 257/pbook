@@ -13,31 +13,28 @@ CFLAGS         = -I$(include_dirs) \
 		-g \
 		-Wall
 
-EXENAME       = pbook
-
 include_dirs  = ./include
 objects       = \
 		pb_limits.o \
 		fs.o \
 		fline.o \
 		btree.o \
-		init_pbook.o \
+		skts.o \
 		pbkd.o \
+		init_pbook.o \
 		pbook.o
 
 pbook:           $(objects)
-#cc -o $(EXENAME) $(objects)
+	cc -o $@ $(objects) && $(MAKE) -C . clean
 
 SRV_PATH      = ./srv
-pbkd:
-	$(MAKE) -C $(SRV_PATH)
+#pbkd.o:
+#$(MAKE) -C $(SRV_PATH)
 	
 
 .PHONY:         clean cleano distclean
 clean:
-	-rm $(EXENAME)
-cleano:
-	rm $(objects)
+	$(MAKE) -C $(SRV_PATH) $@ && rm $(objects)
 distclean:
-	rm $(EXENAME) $(objects)
+	$(MAKE) -C $(SRV_PATH) $@ && rm $(EXENAME) $(objects)
 	

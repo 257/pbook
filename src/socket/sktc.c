@@ -25,6 +25,7 @@ send_recv_2pbk_skt(char *qstrp) {
 	remote.sun_family = AF_UNIX;
 	strcpy(remote.sun_path, SOCK_PATH);
 	len = strlen(remote.sun_path) + sizeof(remote.sun_family);
+	printf("%s\n", SOCK_PATH);
 	if (connect(s, (struct sockaddr *)&remote, len) == -1) {
 		perror("connect");
 		exit(1);

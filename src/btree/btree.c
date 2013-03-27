@@ -33,6 +33,8 @@ mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name
 	return l;
 }
 
+// TODO: isline()
+
 tnode *
 l2node(char *l, char *delim) {
 	tnode *node = NULL;
@@ -58,12 +60,10 @@ l2node(char *l, char *delim) {
 					 */
 					if (isphon(op)) {
 						phon = op;
-						i++;
-						op = NONE;
+						op   = NONE;
+						i    = PHON;
 					} else if (isop(op))
 						;
-					else
-						return NULL;
 					break;
 				case NAME:
 					strcpy(name, tokenp);

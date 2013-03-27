@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "skt.h"
+#include "sktc.h"
 #include "cgigetval.h"
 #include "btree.h"
 #include "html.h"
@@ -48,7 +48,7 @@ main()
 	op   = "Lookup";
 	name = "name";
 	last = "last";
-	phon = "phon";
+	phon = "5143169147";
 
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now
@@ -57,23 +57,21 @@ main()
 	 * we're gonna use unix domain sockets, simpler
 	 */
 
-	if(name == NULL) {
+	if (name == NULL)
 		printf("You didn't enter any name!\n");
-	}
-	else if(last == NULL) {
+	else if (last == NULL)
 		printf("You didn't enter any last name!\n");
-	} else if(op != NULL && strcmp(op , "Lookup") == 0) {
+	else if (op != NULL && strcmp(op , "Lookup") == 0) {
 		qstrp = mk_btreel(qstrp, delim, LOOKUP, phon, name, last);
-		printf("%s\n", qstrp);
+		printf("qstrp back from mk_btreel:\t %s\n", qstrp);
 		qstrp = send_recv_2pbk_skt(qstrp);
+		printf("qstrp back from send_recv_2pbk_skt():\t %s\n", qstrp);
 		// TODO: need wrapper here to print fields
-	} else if(op != NULL && strcmp(op, "Update") == 0) {
+	} else if (op != NULL && strcmp(op, "Update") == 0) {
 		qstrp = mk_btreel(qstrp, delim, UPDATE, phon, name, last);
 		send_recv_2pbk_skt(qstrp);
-	}
-	else {
+	} else
 		printf("something's wrong!\n");
-	}
 
 	html_footer();
 	return 0;

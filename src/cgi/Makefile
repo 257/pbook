@@ -7,8 +7,6 @@ CFLAGS         = -I$(include_dirs) \
 		-g \
 		-Wall
 
-EXENAME       = pbkc
-
 include_dirs  = ../include
 objects       = \
 		fline.o \
@@ -21,7 +19,7 @@ objects       = \
 		xctod.o
 
 pbkc:           $(objects)
-	cc -o $(EXENAME) $(objects) && $(MAKE) -C . cleano
+	cc -o $@ $(objects) && $(MAKE) -C . cleano
 	
 	
 
