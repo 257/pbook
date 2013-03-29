@@ -46,9 +46,9 @@ main()
 	phon = cgigetval("phon");
 
 	op   = "Lookup";
-	name = "name";
-	last = "last";
-	phon = "5143169147";
+	name = "bar";
+	last = "foo";
+	phon = "1000000000";
 
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now

@@ -17,11 +17,11 @@ send_recv_2pbk_skt(char *qstrp) {
 	int t;
 	struct sockaddr_un remote;
 
-	printf("%7s:%s\n", "sktc", "calling socket()...");
+	printf("%7s:%20s:\t%s\n", "sktc", "", "calling socket()...");
 	s = mk_socket();
 	
 	/* TODO: write to log */
-	printf("%7s:%s\n", "sktc", "Trying to connect...");
+	printf("%7s:%20s:\t%s\n", "sktc", "", "Trying to connect...");
 
 	remote.sun_family = AF_UNIX;
 	strcpy(remote.sun_path, SOCK_PATH);
@@ -32,7 +32,7 @@ send_recv_2pbk_skt(char *qstrp) {
 	}
 	
 	/* TODO: write to log */
-	printf("%-7s:%7s:\t%s\n", "sktc", "send()", qstrp);
+	printf("%7s:%20s:\t%s\n", "sktc", "send()", qstrp);
 	if (send(s, qstrp, strlen(qstrp), 0) == -1) {
 		perror("send");
 		exit(1);
@@ -40,7 +40,7 @@ send_recv_2pbk_skt(char *qstrp) {
 	if ((t = recv(s, qstrp, MAX_QUERYS_LEN, 0)) > 0) {
 		qstrp[t] = '\0';
 		// TODO: take this out when you're done
-		printf("%-7s:%7s:\t%s\n", "sktc", "recv()", qstrp);
+		printf("%7s:%20s:\t%s\n", "sktc", "recv()", qstrp);
 		return qstrp;
 	} else {
 		if (t < 0) perror("recv");

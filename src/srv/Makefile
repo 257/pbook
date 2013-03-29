@@ -18,6 +18,6 @@ pbkd:         $(objects)
 clean:
 	-rm $(objects)
 distclean:
-	$(MAKE) -C $(PWD) clean
+	$(MAKE) -C $(PREFIX) clean
 
 	

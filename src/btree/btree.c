@@ -13,6 +13,7 @@ grow_btree(FILE *dbfp, tnode *root) {
 	return root;
 }
 
+/* TODO: this doeesn't belong here; client side stuff*/
 char *
 mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last) {
 	switch (op) {
@@ -78,7 +79,7 @@ l2node(char *l, char *delim) {
 			}
 		}
 		/* TODO: TOASK: is the cast here called for? */
-		node = mk_node(node, (unsigned short) op, phon, name, last, HITS);
+		node = mk_node(node, (unsigned short) op, HITS, phon, name, last);
 	}
 	return  node;
 }
@@ -169,7 +170,7 @@ lookup(tnode *root, tnode *q) {
 	 * printf("lookup: tree\n");
 	 */
 	if (root == NULL) {
-		q = mk_node(root, LOOKUP, NONE, NULL, NULL, q->count);
+		q = mk_node(root, NONE, q->count, S_PHON, NULL, NULL);
 		return q;
 		/* ishit? keep track */
 	} else if ((cond = strcmp(q->name, root->name)) == 0) {
@@ -398,7 +399,7 @@ char *itoa(long long value, char *digits, int base)
 /* broken i know, would have been a nice analogy */
 
 tnode *
-mk_node(tnode *node, unsigned short op, long long ph, char *n, char *l, int count) {
+mk_node(tnode *node, unsigned short op, int count, long long ph, char *n, char *l)  {
 	node         = talloc();
 	node->op     = op;
 	node->phon   = ph; /* we don't care about BPHN, caller's job */

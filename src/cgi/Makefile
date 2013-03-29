@@ -5,9 +5,9 @@ MAKEFLAGS      = --no-print-directory
 PREFIX        := $(PWD)
 CSTD           = c99
 CFLAGS         = -I$(include_dirs) \
-		-g \
-		-Wall \
-		-std=$(CSTD)
+		 -std=$(CSTD) \
+		 -g \
+		 -Wall
 
 include_dirs  = ../include
 objects       = \
@@ -20,6 +20,7 @@ objects       = \
 		htmlf.o \
 		xctod.o
 
+EXENAME        = pbkc
 pbkc:           $(objects)
 	cc -o $@ $(objects) && $(MAKE) -C . cleano
 	
@@ -32,7 +33,6 @@ cgi:            pbook
 clean:
 	-rm $(EXENAME)
 cleano:
-	rm $(objects)
+	-rm $(objects)
 distclean:
-	rm $(EXENAME) $(objects)
-	
+	-rm $(EXENAME) $(objects)

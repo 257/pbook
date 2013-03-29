@@ -62,14 +62,14 @@ recv_send_2pbk_skt() {
 		do {
 			n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
 			bufp[n] = '\0';
-			printf("%7s:%7s:\t%s\n", "skts", "recv()", bufp);
+			printf("%7s:%20s:\t%s\n", "skts", "recv()", bufp);
 			if (n <= 0) {
 				if (n < 0) perror("recv");
 				done = 1;
 			}
 			if (!done) {
 				bufp   = parse_op(bufp);
-				printf("%7s:%7s:\t%s\n", "skts", "send()", bufp);
+				printf("%7s:%20s:\t%s\n", "skts", "send()", bufp);
 				if (send(s2, bufp, n, 0) < 0) {
 					perror("send");
 					done = 1;

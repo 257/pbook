@@ -9,9 +9,11 @@ modules       += :main
 
 MAKEFLAGS      = --no-print-directory
 PREFIX        := $(PWD)
+CSTD           = c99
 CFLAGS         = -I$(include_dirs) \
-		-g \
-		-Wall
+		 -std=$(CSTD) \
+		 -g \
+		 -Wall
 
 include_dirs  = ./include
 objects       = \
@@ -25,7 +27,8 @@ objects       = \
 		pbook.o
 
 pbook:           $(objects)
-	cc -o $@ $(objects) && $(MAKE) -C . clean
+	cc -o $@ $(objects) && \
+		$(MAKE) -C $(PWD) clean
 
 SRV_PATH      = ./srv
 #pbkd.o:
@@ -34,7 +37,8 @@ SRV_PATH      = ./srv
 
 .PHONY:         clean cleano distclean
 clean:
-	$(MAKE) -C $(SRV_PATH) $@ && rm $(objects)
+	rm $(objects) && \
+	$(MAKE) -C $(SRV_PATH) $@
 distclean:
 	$(MAKE) -C $(SRV_PATH) $@ && rm $(EXENAME) $(objects)
 	
