@@ -18,7 +18,8 @@ objects       = \
 		pbkc.o \
 		sktc.o \
 		htmlf.o \
-		xctod.o
+		xctod.o \
+		pbc_helpers.o
 
 EXENAME        = pbkc
 pbkc:           $(objects)

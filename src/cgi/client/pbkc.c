@@ -8,6 +8,7 @@
 #include "html.h"
 
 #include "ansi_colours.h"
+#include "pbc_helpers.h"
 
 /* only thing we need from btree.h, so far */
 /* TODO: there is more define delim */
@@ -30,49 +31,44 @@ main()
 {
 	html_header("pbook");
 
-	char *op;
-	char *name;
-	char *last;
-	char *phon;
+	char *op    = NULL;
+	char *name  = NULL;
+	char *last  = NULL;
+	char *phonc = NULL;
 
 	char qstr[MAX_QUERYS_LEN];
 	char *qstrp;
 	qstrp = qstr;
+	// int op = NONE;
+	// long long phon = atoll(input);
 
 
-	op   = cgigetval("op");
-	name = cgigetval("name");
-	last = cgigetval("last");
-	phon = cgigetval("phon");
+	op    = cgigetval("op");
+	name  = cgigetval("name");
+	last  = cgigetval("last");
+	phonc = cgigetval("phon");
 
-	op   = "Lookup";
-	name = "bar";
-	last = "foo";
-	phon = "1000000000";
+	// tnode *pbc_node = mk_node(qnode, op, NONE, phon, name, last);
 
+	op             = "Lookup";
+	name           = "bar";
+	last           = "foo";
+	phonc          = "1000000000";
+
+	if ((!isfield(op, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
+		goto footer;
+	int upbit;
+	upbit = (strcmp(op , "LOOKUP")) ? LOOKUP : NONE;
+	upbit = (strcmp(op , "UPDATE")) ? UPDATE : NONE;
+	qstrp = mk_btreel(qstrp, delim, LOOKUP, phonc, name, last);
+	parse_up(qstrp, upbit);
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now
 	 * but that needs a shared memory implementation
 	 * again notime.
 	 * we're gonna use unix domain sockets, simpler
 	 */
-
-	if (name == NULL)
-		printf("You didn't enter any name!\n");
-	else if (last == NULL)
-		printf("You didn't enter any last name!\n");
-	else if (op != NULL && strcmp(op , "Lookup") == 0) {
-		qstrp = mk_btreel(qstrp, delim, LOOKUP, phon, name, last);
-		printf("%7s:%20s:\t%s\n", "pbkc", "mk_btreel", qstrp);
-		qstrp = send_recv_2pbk_skt(qstrp);
-		printf("%7s:%20s:\t%s\n", "pbkc", "send_recv_2pbk_skt", qstrp);
-		// TODO: need wrapper here to print fields
-	} else if (op != NULL && strcmp(op, "Update") == 0) {
-		qstrp = mk_btreel(qstrp, delim, UPDATE, phon, name, last);
-		qstrp = send_recv_2pbk_skt(qstrp);
-	} else
-		printf("something's wrong!\n");
-
+footer:
 	html_footer();
 	return 0;
 }
