@@ -1,4 +1,5 @@
 #include "skts.h"
+#include "ansi_colours.h"
 
 
 int
@@ -14,8 +15,8 @@ void
 recv_send_2pbk_skt() {
 	socklen_t t;
 	struct sockaddr_un local, remote;
-	char str[MAX_QUERYS_LEN] = {0};
-	char *strp = str;
+	char buf[MAX_QUERYS_LEN];
+	char *bufp = buf;
 	int s;
 
 	s = mk_socket();
@@ -42,7 +43,6 @@ recv_send_2pbk_skt() {
 	 */
 	for(;;) {
 		int done, n, s2;
-		printf("SOCK_PATH:\t%s\n", SOCK_PATH);
 		printf("\t\nWaiting for a connection...\n");
 		t = sizeof(remote);
 		/*
@@ -57,17 +57,20 @@ recv_send_2pbk_skt() {
 			perror("accept");
 			exit(1);
 		}
-		printf("Connected.\n");
+		printf("\t\nConnected.\n");
 		done = 0;
 		do {
-			n = recv(s2, strp, 100, 0);
+			n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
+			bufp[n] = '\0';
+			printf("%7s:%7s:\t%s\n", "skts", "recv()", bufp);
 			if (n <= 0) {
 				if (n < 0) perror("recv");
 				done = 1;
 			}
 			if (!done) {
-				strp   = parse_op(strp);
-				if (send(s2, str, n, 0) < 0) {
+				bufp   = parse_op(bufp);
+				printf("%7s:%7s:\t%s\n", "skts", "send()", bufp);
+				if (send(s2, bufp, n, 0) < 0) {
 					perror("send");
 					done = 1;
 				}
@@ -78,10 +81,8 @@ recv_send_2pbk_skt() {
 
 char *
 parse_op(char *buf) {
-	printf("buf: %s\n", buf);
 	tnode *qnode = NULL;
 	qnode = l2node(buf, delim);
-	node_printf(qnode);
 	switch (qnode->op) {
 		case UPDATE:
 			qnode = update_node(root, qnode);
@@ -92,5 +93,6 @@ parse_op(char *buf) {
 		default:
 			break;
 	}
-	return node2line(qnode);
+	buf = node2line(qnode, delim, buf);
+	return buf;
 }

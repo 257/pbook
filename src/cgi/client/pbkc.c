@@ -7,11 +7,11 @@
 #include "btree.h"
 #include "html.h"
 
+#include "ansi_colours.h"
+
 /* only thing we need from btree.h, so far */
 /* TODO: there is more define delim */
 // enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
-
-extern char *cgigetval(char *);
 
 
 /* TODO: ntime, ideally this should be hidden
@@ -35,7 +35,7 @@ main()
 	char *last;
 	char *phon;
 
-	char qstr[MAX_Q_LEN];
+	char qstr[MAX_QUERYS_LEN];
 	char *qstrp;
 	qstrp = qstr;
 
@@ -63,13 +63,13 @@ main()
 		printf("You didn't enter any last name!\n");
 	else if (op != NULL && strcmp(op , "Lookup") == 0) {
 		qstrp = mk_btreel(qstrp, delim, LOOKUP, phon, name, last);
-		printf("qstrp back from mk_btreel:\t %s\n", qstrp);
+		printf("%7s:%20s:\t%s\n", "pbkc", "mk_btreel", qstrp);
 		qstrp = send_recv_2pbk_skt(qstrp);
-		printf("qstrp back from send_recv_2pbk_skt():\t %s\n", qstrp);
+		printf("%7s:%20s:\t%s\n", "pbkc", "send_recv_2pbk_skt", qstrp);
 		// TODO: need wrapper here to print fields
 	} else if (op != NULL && strcmp(op, "Update") == 0) {
 		qstrp = mk_btreel(qstrp, delim, UPDATE, phon, name, last);
-		send_recv_2pbk_skt(qstrp);
+		qstrp = send_recv_2pbk_skt(qstrp);
 	} else
 		printf("something's wrong!\n");
 

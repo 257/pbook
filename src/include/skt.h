@@ -13,7 +13,7 @@
 #define SOCK_PATH      "/tmp/22294"
 #define MAX_Q_LEN      5
 /* 3 fields, 2 FS, \0 */
-#define MAX_QUERYS_LEN ((3*MAXNAME) + 2 + 1)
+#define MAX_QUERYS_LEN ((4*MAXNAME) + 2 + 1)
 
 int   mk_socket(void);
 extern char   *parse_op(char *buf); /* shouldn't be here */

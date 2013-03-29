@@ -3,9 +3,11 @@ SUBDIRS        = .
 
 MAKEFLAGS      = --no-print-directory
 PREFIX        := $(PWD)
+CSTD           = c99
 CFLAGS         = -I$(include_dirs) \
 		-g \
-		-Wall
+		-Wall \
+		-std=$(CSTD)
 
 include_dirs  = ../include
 objects       = \

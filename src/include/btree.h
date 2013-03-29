@@ -49,15 +49,13 @@ extern tnode        *mk_node(tnode *, unsigned short op, long long ph, char *, c
 extern tnode        *lookup(tnode *, tnode *);
 extern int          fgetline(FILE *fp, char line[], int max);
 extern void         treeprint(tnode *, int);
-/* void         tree_fwrite(tnode *, int, FILE *); */
 extern void         tree_fprintf(tnode *, int, FILE *);
 extern void         node_fprintf(tnode *, int, FILE *);
 extern void         node_printf(tnode *);
-/* void         node_fwrite(FILE *, tnode *); */
 extern void         hit_print(tnode *);
 extern char  *       nodef_print(tnode *, char *, int);
-extern char  *      node2line(tnode *);
-extern tnode *      l2node(char *l, char *);
+extern char  *      node2line(tnode *, char *delim, char *l);
+extern tnode *      l2node(char *l, char *delim);
 extern tnode *      update_node(tnode *, tnode *);
 unsigned short int  isop(long long);
 extern char  *      mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last);

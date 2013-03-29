@@ -1,3 +1,4 @@
+#include "pb_str.h"
 #include "btree.h"
 
 char *delim = DELIM;
@@ -246,16 +247,55 @@ node_printf(tnode *node) {
 }
 
 char *
-node2line(tnode *node) {
-	char l[MAX_ENTL];
-	char *lp = l;
-	char phon[MAXNAME];
-	char *phonp = phon;
-	// itoa(nodef_print(node, PHON));
-	strcpy(lp, nodef_print(node, phonp, PHON));
-	strcat(lp, nodef_print(node, NULL, NAME));
-	strcat(lp, nodef_print(node, NULL, LAST));
-	return lp;
+node2line(tnode *node, char *delim, char *lbuf) {
+	lbuf = strcpy(lbuf, nodef_print(node, lbuf, PHON));
+	lbuf = strcat(lbuf, delim);
+	lbuf = strcat(lbuf, nodef_print(node, NULL, NAME));
+	lbuf = strcat(lbuf, delim);
+	lbuf = strcat(lbuf, nodef_print(node, NULL, LAST));
+	return lbuf;
+}
+
+char *
+nodef_print(tnode *node, char *phon, int prm) {
+	if (node->name != NULL)
+		switch (prm) {
+			case PHON:
+				phon = itoa(node->phon, phon, 10);
+				return phon;
+				break;
+			case NAME:
+				return node->name;
+				break;
+			/*
+			case NAME_PHON:
+				nodef_print(node, NAME);
+				nodef_print(node, PHON);
+				break;
+				*/
+			case LAST:
+				return node->last;
+				break;
+			/*
+			case LAST_PHON:
+				nodef_print(node, LAST);
+				nodef_print(node, PHON);
+				break;
+			case LAST_NAME:
+				nodef_print(node, LAST);
+				nodef_print(node, NAME);
+				break;
+			case ALL:
+				nodef_print(node, LAST_NAME);
+				nodef_print(node, PHON);
+				break;
+				*/
+			default:
+				return node->name;
+				break;
+		}
+	else
+		return node->name;
 }
 void
 tree_fprintf(tnode *root, int order, FILE *dbfp) {
@@ -356,47 +396,6 @@ char *itoa(long long value, char *digits, int base)
 }
 
 /* broken i know, would have been a nice analogy */
-char *
-nodef_print(tnode *node, char *phon, int prm) {
-	if (node->name != NULL)
-		switch (prm) {
-			case PHON:
-				phon = itoa(node->phon, phon, 10);
-				return phon;
-				break;
-			case NAME:
-				return node->name;
-				break;
-			/*
-			case NAME_PHON:
-				nodef_print(node, NAME);
-				nodef_print(node, PHON);
-				break;
-				*/
-			case LAST:
-				return node->last;
-				break;
-			/*
-			case LAST_PHON:
-				nodef_print(node, LAST);
-				nodef_print(node, PHON);
-				break;
-			case LAST_NAME:
-				nodef_print(node, LAST);
-				nodef_print(node, NAME);
-				break;
-			case ALL:
-				nodef_print(node, LAST_NAME);
-				nodef_print(node, PHON);
-				break;
-				*/
-			default:
-				return node->name;
-				break;
-		}
-	else
-		return node->name;
-}
 
 tnode *
 mk_node(tnode *node, unsigned short op, long long ph, char *n, char *l, int count) {
@@ -410,6 +409,15 @@ mk_node(tnode *node, unsigned short op, long long ph, char *n, char *l, int coun
 	return node;
 }
 
+char *strdup(char *s)         /* make a duplicate of s */
+{
+     char *p;
+
+      p = (char *) malloc(strlen(s)+1); /* +1 for '\0' */
+      if (p != NULL)
+          strcpy(p, s);
+      return p;
+}
 
 /* talloc: make a tnode */
 tnode *

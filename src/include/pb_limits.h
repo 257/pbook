@@ -5,7 +5,7 @@
 #define MAXNAME		20
 // #define MAX_ENTL		782
 /* this defined in pbookd.h as well */
-#define MAX_ENTL        ((3*MAXNAME) + 2 + 1) /* 3 fields, 2 FS, \0 */
+#define MAX_ENTL        ((4*MAXNAME) + 2 + 1) /* 3 fields, 2 FS, \0 */
 
 #include "std_libc.h"
 
