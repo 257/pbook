@@ -26,6 +26,7 @@
  * crap like ":" in it.
  */
 
+int wazup(char *);
 int
 main()
 {
@@ -57,12 +58,9 @@ main()
 
 	if ((!isfield(op, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
 		goto footer;
-	int upbit = NONE;
-	upbit = (strcmp(op , "LOOKUP")) ? upbit : LOOKUP;
-	upbit = (strcmp(op , "UPDATE")) ? upbit : UPDATE;
 
+	int upbit = wazup(op);
 	qstrp = mk_btreel(qstrp, delim, LOOKUP, phonc, name, last);
-
 	parse_up(qstrp, upbit);
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now
@@ -73,4 +71,11 @@ main()
 footer:
 	html_footer();
 	return 0;
+}
+int
+wazup(char *op) {
+	int upbit = NONE;
+	upbit = (strcmp(op , "LOOKUP")) ? upbit : LOOKUP;
+	upbit = (strcmp(op , "UPDATE")) ? upbit : UPDATE;
+	return upbit;
 }
