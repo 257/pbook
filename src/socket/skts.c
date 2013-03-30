@@ -79,6 +79,7 @@ recv_send_2pbk_skt() {
 	}
 }
 
+// TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
 	tnode *qnode = NULL;

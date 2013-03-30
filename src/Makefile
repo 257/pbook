@@ -41,4 +41,3 @@ clean:
 	$(MAKE) -C $(SRV_PATH) $@
 distclean:
 	$(MAKE) -C $(SRV_PATH) $@ && rm $(EXENAME) $(objects)
-	

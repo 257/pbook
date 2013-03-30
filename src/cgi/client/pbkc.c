@@ -50,17 +50,19 @@ main()
 
 	// tnode *pbc_node = mk_node(qnode, op, NONE, phon, name, last);
 
-	op             = "Lookup";
-	name           = "bar";
-	last           = "foo";
+	op             = "LOOKUP";
+	name           = "biz";
+	last           = "biz";
 	phonc          = "1000000000";
 
 	if ((!isfield(op, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
 		goto footer;
-	int upbit;
-	upbit = (strcmp(op , "LOOKUP")) ? LOOKUP : NONE;
-	upbit = (strcmp(op , "UPDATE")) ? UPDATE : NONE;
+	int upbit = NONE;
+	upbit = (strcmp(op , "LOOKUP")) ? upbit : LOOKUP;
+	upbit = (strcmp(op , "UPDATE")) ? upbit : UPDATE;
+
 	qstrp = mk_btreel(qstrp, delim, LOOKUP, phonc, name, last);
+
 	parse_up(qstrp, upbit);
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now
