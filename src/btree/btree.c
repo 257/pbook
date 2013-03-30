@@ -189,29 +189,27 @@ lookup(tnode *root, tnode *q) {
 }
 
 tnode *
-update_node(tnode *root, tnode *node) {
+update_node(tnode *root, tnode *update_node) {
 	tnode *q = NULL;
-	q = node;
+	q = update_node;
 	q = lookup(root, q);
 	switch (q->count) {
 		case HITS:
-			if (node->phon == q->phon) {
-				printf("the phone number you ");
-				printf("entered is the _same_ ");
-				printf("as the one on the record\n");
-				printf("\nno update is required.\n\n");
+			if (q->phon == update_node->phon) {
+				strcpy(update_node->name, "already up2date");
+				strcpy(update_node->last, "already up2date");
 			} else {
-				q->phon = node->phon;
-				printf("\nrecord has been updated for:\t%s %s\n\n", node->last, node->name);
+				q->phon = update_node->phon;
 			}
-			return q;
 			break;
+			/* TODO: *commit* after update */
 		case NOHITS:
 		default:
-			printf("\nno record was found for:\t%s %s\n\n", node->last, node->name);
-			return q;
+			update_node->name = strcpy(update_node->name, "record !here");
+			update_node->last = strcpy(update_node->last, "record !here");
 			break;
 	}
+	return update_node;
 }
 void
 treeprint(tnode *root, int order) {

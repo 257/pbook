@@ -3,6 +3,8 @@
 
 #define DELIM     ":"
 
+#include "debug.h"
+#include "node_print.h"
 #include "pb_limits.h"
 #include "pb_line.h"
 

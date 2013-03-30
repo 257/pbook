@@ -85,11 +85,11 @@ parse_op(char *buf) {
 	tnode *qnode = NULL;
 	qnode = l2node(buf, delim);
 	switch (qnode->op) {
-		case UPDATE:
-			qnode = update_node(root, qnode);
-			break;
 		case LOOKUP:
 			qnode = lookup(root, qnode);
+			break;
+		case UPDATE: /* update will lookup */
+			qnode = update_node(root, qnode);
 			break;
 		default:
 			break;

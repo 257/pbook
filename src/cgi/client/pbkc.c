@@ -26,13 +26,12 @@
  * crap like ":" in it.
  */
 
-int wazup(char *);
 int
 main()
 {
 	html_header("pbook");
 
-	char *op    = NULL;
+	char *up    = NULL;
 	char *name  = NULL;
 	char *last  = NULL;
 	char *phonc = NULL;
@@ -44,22 +43,21 @@ main()
 	// long long phon = atoll(input);
 
 
-	op    = cgigetval("op");
+	up    = cgigetval("op");
 	name  = cgigetval("name");
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	// tnode *pbc_node = mk_node(qnode, op, NONE, phon, name, last);
-
-	op             = "LOOKUP";
-	name           = "biz";
-	last           = "biz";
+	up             = "UPDATE";
+	name           = "pink";
+	last           = "ponk";
 	phonc          = "1000000000";
+//1111111000:ponk:pink
 
-	if ((!isfield(op, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
+	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
 		goto footer;
 
-	int upbit = wazup(op);
+	int upbit = waz(up);
 	qstrp = mk_btreel(qstrp, delim, LOOKUP, phonc, name, last);
 	parse_up(qstrp, upbit);
 	/* i could just pass query pbkd for *root and then
@@ -71,11 +69,4 @@ main()
 footer:
 	html_footer();
 	return 0;
-}
-int
-wazup(char *op) {
-	int upbit = NONE;
-	upbit = (strcmp(op , "LOOKUP")) ? upbit : LOOKUP;
-	upbit = (strcmp(op , "UPDATE")) ? upbit : UPDATE;
-	return upbit;
 }
