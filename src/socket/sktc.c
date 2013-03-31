@@ -1,6 +1,7 @@
 #include "sktc.h"
 #include "ansi_colours.h"
 
+/* TODO: move to skt.c */
 int
 mk_socket() {
 	int s;
@@ -17,12 +18,8 @@ send_recv_2pbk_skt(char *qstrp) {
 	int t;
 	struct sockaddr_un remote;
 
-	// printf("%7s:%20s:\t%s\n", "sktc", "", "calling socket()...");
 	s = mk_socket();
 	
-	/* TODO: write to log */
-	// printf("%7s:%20s:\t%s\n", "sktc", "", "Trying to connect...");
-
 	remote.sun_family = AF_UNIX;
 	strcpy(remote.sun_path, SOCK_PATH);
 	len = strlen(remote.sun_path) + sizeof(remote.sun_family);

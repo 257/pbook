@@ -15,6 +15,6 @@
 #define DEBUGh               fprintf(stderr, BOLDWHITE "  [DEBUG]  " RESET)
 #define DEBUGs(...)          (DEBUGh, DIDEN_VALs(__VA_ARGS__))
 #define DEBUGd(...)          (DEBUGh, DIDEN_VALd(__VA_ARGS__))
-#define Dmsg(...)            (DEBUGh, fprintf(stderr, __VA_ARGS__))
+#define Dmsg(...)            (DEBUGh, fprintf(stderr, str(__VA_ARGS__\n)))
 
 #endif

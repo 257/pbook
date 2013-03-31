@@ -46,12 +46,10 @@ parse_up(char *qstrp, int upbit) {
 				break;
 			}
 			else {
-				printf("\n\record !here\t\n");
 				ret = NONE;
 			}
 		case UPDATE:
 			// DEBUGs(qstrp);
-			qstrp = send_recv_2pbk_skt(qstrp);
 			ret = NONE;
 			break;
 		default:
@@ -62,7 +60,8 @@ parse_up(char *qstrp, int upbit) {
 
 int
 waz(char *up) {
-	int upbit = NONE;
+	int upbit;
+	upbit = NONE;
 	upbit = (strcmp(up , "LOOKUP")) ? upbit : LOOKUP;
 	upbit = (strcmp(up , "UPDATE")) ? upbit : UPDATE;
 	return upbit;

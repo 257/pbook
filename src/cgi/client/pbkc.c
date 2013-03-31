@@ -48,7 +48,7 @@ main()
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	up             = "LOOKUP";
+	up             = "UPDATE";
 	name           = "pink";
 	last           = "ponk";
 	phonc          = "1000000000";
@@ -58,7 +58,7 @@ main()
 		goto footer;
 
 	int upbit = waz(up);
-	qstrp = mk_btreel(qstrp, delim, LOOKUP, phonc, name, last);
+	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
 	parse_up(qstrp, upbit);
 	/* i could just pass query pbkd for *root and then
 	 * do btree operations on right here, right now

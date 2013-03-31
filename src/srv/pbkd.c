@@ -9,12 +9,12 @@ pbkd(int mode) {
 	// static int s2;
 	switch (mode) {
 		case START:
-			Dmsg("send EOF with Ctrl-D to stop pbd\n");
+			Dmsg(send EOF with Ctrl-D to stop pbd);
 			while ((c = getchar()) != EOF) {
-				Dmsg("started pbd in foreground mode\n");
+				Dmsg(started pbd in foreground mode);
 				recv_send_2pbk_skt();
 			}
-			Dmsg("caught EOF, closing pbd\n");
+			Dmsg(caught EOF closing pbd);
 			break;
 		case KILL: // for signal(), not implemented 
 			// close(s2);

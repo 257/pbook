@@ -1,7 +1,7 @@
 #include "pb_str.h"
 #include "btree.h"
 
-char *delim = DELIM;
+char  *delim = DELIM;
 
 tnode *
 grow_btree(FILE *dbfp, tnode *root) {
@@ -40,9 +40,9 @@ mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name
 tnode *
 l2node(char *l, char *delim) {
 	tnode *node = NULL;
-	char name[MAXNAME];
-	char last[MAXNAME];
 	long long phon = NONE;
+	char *name;
+	char *last;
 	char *tokenp;
 	int i  = OP;
 	long long op = NONE;
@@ -74,11 +74,13 @@ l2node(char *l, char *delim) {
 						op   = NONE;
 					}
 				case NAME:
-					strcpy(name, tokenp);
+					//strcpy(name, tokenp);
+					name = tokenp;
 					break;
 				case NAME_PHON:
 				case LAST:
-					strcpy(last, tokenp);
+					// strcpy(last, tokenp);
+					last = tokenp;
 					break;
 				default:
 					break;
@@ -92,7 +94,7 @@ l2node(char *l, char *delim) {
 void
 ugrow_btree(tnode *root, FILE *dbfp) {
 	// treeprint(root, PRE);
-	Dmsg("Writing to file...\n");
+	Dmsg(Writing to file...);
 	tree_fprintf(root, PRE, dbfp);
 }
 
@@ -126,84 +128,26 @@ addnode_2root(tnode *root, tnode *node) {
 		root->right = addnode_2root(root->right, node);
 	return root;
 }
-unsigned int
+
+/* caller of ins_node _must_ mk_node(node) before the call */
+/* TODO: node here should be const node */
+
+int
 ins_node(tnode *root, tnode *node) {
-	int cond;
-	if (root == NULL) {         /* a new name has arrived */
-		root = node;
-		return 0;
-	} else if ((cond = strcmp(node->name, root->name)) == 0) {
-		node->count++;
-		if ((cond = strcmp(node->last, root->last)) == 0) {
-			printf("can't insert duplicate\n");
-			return 1;
-		} else if (cond < 0) {
-			if (root->left == NULL)
-				root->left = node;
-			else
-				ins_node(root->left, node);
-		} else {
-			if (root->right == NULL)
-				root->right = node;
-			else
-				ins_node(root->right, node);
-		}
-	} else if (cond < 0) {
-		if (root->left == NULL)
-			root->left = node;
-		else
-			ins_node(root->left, node);
+	int ret;
+	DEBUGfunch(ins_node);
+	tnode **place_in_tree = lookup(root, node);
+	if (*place_in_tree == NULL) {
+		Dmsg(NO math inserting here);
+		*place_in_tree = node;
+		ret  = INS;
 	} else {
-		if (root->right == NULL)
-			root->right = node;
-		else
-			ins_node(root->right, node);
+		Dmsg(found a match updating);
+		*place_in_tree->phon = node->phon;
+		ret  = UPDATE;
 	}
-	return 0;
+	return ret;
 }
-
-/* TODO: caller has to make sure lookup
- * is handed a q node with
- * q->op == LOOKUP
- * for invetory reasons
- */
-
-
-tnode *
-lookup(tnode *root, tnode *q) {
-	if (root == NULL)
-		return root;
-	int matched;
-	DEBUGs(q->name);
-	DEBUGs(q->last);
-	Dmsg("tree from here\n");
-	treeprint(root, PRE);
-	matched = isnmatch(root, q);
-	if (matched == 0)
-		if ((matched = islmatch(root, q)) == 0)
-			return root;
-		else
-			if (matched < 0)
-				return lookup(root->left, q);
-			else
-				return lookup(root->right, q);
-	else if (matched < 0)
-		return lookup(root->left, q);
-	else
-		return lookup(root->right, q);
-}
-
-/* TODO: !function */
-unsigned int
-isnmatch(tnode *root, tnode *q) {
-	return strcmp(q->name, root->name);
-}
-/* TODO: !function */
-unsigned int
-islmatch(tnode *root, tnode *q) {
-	return strcmp(q->last, root->last);
-}
-
 tnode *
 update_node(tnode *root, tnode *update_node) {
 	tnode *q = NULL;
@@ -211,12 +155,10 @@ update_node(tnode *root, tnode *update_node) {
 	q = lookup(root, q);
 	switch (q->count) {
 		case HITS:
-			if (q->phon == update_node->phon) {
-				strcpy(update_node->name, "already up2date");
-				strcpy(update_node->last, "already up2date");
-			} else {
+			if (q->phon == update_node->phon)
+				all_up2date(update_node);
+			else
 				q->phon = update_node->phon;
-			}
 			break;
 			/* TODO: *commit* after update */
 		case NOHITS:
@@ -227,6 +169,31 @@ update_node(tnode *root, tnode *update_node) {
 	}
 	return update_node;
 }
+
+tnode *
+lookup(tnode *root, tnode *q) {
+	if (root == NULL)
+		return root;
+	int nmatched;
+	int lmatched;
+	DEBUGs(q->name);
+	DEBUGs(q->last);
+	Dmsg(tree from here);
+	treeprint(root, PRE);
+	if ((nmatched = isnmatch(q)) == 0)
+		if ((lmatched = islmatch(q)) == 0)
+			return root;
+		else
+			if (lmatched < 0)
+				return lookup(root->left, q);
+			else
+				return lookup(root->right, q);
+	else if (nmatched < 0)
+		return lookup(root->left, q);
+	else
+		return lookup(root->right, q);
+}
+
 void
 treeprint(tnode *root, int order) {
 	if (root != NULL) {

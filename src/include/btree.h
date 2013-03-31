@@ -14,6 +14,13 @@ enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
 
 #define BPHN   BOP
 
+
+#define isnmatch(...)        strcmp(__VA_ARGS__->name, root->name)
+#define islmatch(...)        strcmp(__VA_ARGS__->last, root->last)
+
+#define name_up2date(...)    strcpy(__VA_ARGS__->name, "already up2date")
+#define last_up2date(...)    strcpy(__VA_ARGS__->last, "already up2date")
+#define  all_up2date(...)    (name_up2date(__VA_ARGS__), last_up2date(__VA_ARGS__))
 // #define isop(op)   ((op <= NONE) || (BADOP <= op)) ? NONE : op
 
 
@@ -42,16 +49,16 @@ struct tnode {                    /* the tree node: */
 	tnode *right;             /* right child */
 };
 
+extern tnode *redun;
+extern tnode *root;
+
 extern tnode        *grow_btree(FILE *, tnode *);
 extern void          ugrow_btree(tnode *, FILE *);
 extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
-extern unsigned int  ins_node(tnode *, tnode *);
+extern int           ins_node(tnode *, tnode *);
 extern tnode        *mk_node(tnode *, unsigned short op, int count, long long ph, char *n, char *l);
 extern tnode        *lookup(tnode *, tnode *);
-extern unsigned int  isnmatch(tnode *, tnode *);
-extern unsigned int  islmatch(tnode *, tnode *);
-extern unsigned int  ismatch(tnode *, tnode *);
 extern int           fgetline(FILE *fp, char line[], int max);
 extern void          treeprint(tnode *, int);
 extern void          tree_fprintf(tnode *, int, FILE *);

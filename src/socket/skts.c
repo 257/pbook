@@ -1,9 +1,12 @@
 #include "skts.h"
 #include "ansi_colours.h"
 
+tnode *redun = NULL;
 
+/* TODO: move to skt.c */
 int
 mk_socket() {
+	int s;
 	if ((s = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		perror("socket");
 		exit(1);
@@ -13,6 +16,7 @@ mk_socket() {
 
 void
 recv_send_2pbk_skt() {
+	int len;
 	socklen_t t;
 	struct sockaddr_un local, remote;
 	char buf[MAX_QUERYS_LEN];
@@ -43,7 +47,7 @@ recv_send_2pbk_skt() {
 	 */
 	for(;;) {
 		int done, n, s2;
-		Dmsg("Waiting for a connection...\n");
+		Dmsg(Waiting for a connection...);
 		t = sizeof(remote);
 		/*
 		 * When accept() returns,
@@ -57,12 +61,12 @@ recv_send_2pbk_skt() {
 			perror("accept");
 			exit(1);
 		}
-		Dmsg("Connected.\n");
+		Dmsg(Connected.);
 		done = 0;
 		do {
 			n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
 			bufp[n] = '\0';
-			Dmsg("recv()\n");
+			Dmsg(recv());
 			DEBUGs(bufp);
 			if (n <= 0) {
 				if (n < 0) perror("recv");
@@ -71,7 +75,7 @@ recv_send_2pbk_skt() {
 			if (!done) {
 				DEBUGs(bufp);
 				bufp   = parse_op(bufp);
-				Dmsg("send()\n");
+				Dmsg(send());
 				if (send(s2, bufp, n, 0) < 0) {
 					perror("send");
 					done = 1;
@@ -84,20 +88,34 @@ recv_send_2pbk_skt() {
 // TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
-	Dmsg("in pars_op\n");
+	Dmsg(in pars_op);
 	tnode *qnode = NULL;
 	qnode = l2node(buf, delim);
+	redun = mk_node(redun, NONE, NONE, NONE, NULL, NULL);
+	int insbit;
 	switch (qnode->op) {
 		case LOOKUP:
-			Dmsg("calling lookup from parse_op\n");
 			if ((qnode = lookup(root, qnode)) != NULL)
 				buf = node2line(qnode, delim, buf);
+			else {
+				redun->name = Alice;
+				redun->last = Alice;
+				buf = node2line(redun, delim, buf);
+			}
 			break;
-		case UPDATE: /* update will lookup */
-			qnode = update_node(root, qnode);
+		case UPDATE:
+			insbit = ins_node(root, qnode);
+			switch (insbit) {
+				case INS:
+					redun->op = INS;
+					buf = node2line(redun, delim, buf);
+				case UPDATE:
+					redun->op = UPDATE;
+					buf = node2line(redun, delim, buf);
 			break;
 		default:
 			break;
+			}
 	}
 	return buf;
 }
