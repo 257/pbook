@@ -12,10 +12,10 @@ main() {
 	 * if running in daemon mode
 	 * you need to close the socket
 	 */
-	treeprint(root, PRE);
 	// init_ui(root);
+	treeprint(root, PRE);
 	pbkd(START);
-	// pbkd(KILL);
+	// pbkd(root, KILL);
 	treeprint(root, PRE);
 	uinit_pbook(root);
 	return 0;

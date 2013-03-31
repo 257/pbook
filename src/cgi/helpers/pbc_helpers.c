@@ -1,4 +1,5 @@
 #include "pbc_helpers.h"
+#include "node_print.h"
 
 int
 isfield(char *input, int field) {
@@ -33,14 +34,14 @@ isfield(char *input, int field) {
 int
 parse_up(char *qstrp, int upbit) {
 	int ret;
-	DEBUG(qstrp);
 	qstrp = send_recv_2pbk_skt(qstrp);
 	tnode *retnode = l2node(qstrp, delim);
 	switch (upbit) {
 		case LOOKUP:
 			/* TODO: handle other cases */
 			if (retnode->count == 1) {
-				printf("%lld\n", retnode->phon);
+				// DEBUGs(qstrp);
+				PPHON(retnode);
 				ret = 0;
 				break;
 			}
@@ -49,7 +50,7 @@ parse_up(char *qstrp, int upbit) {
 				ret = NONE;
 			}
 		case UPDATE:
-			DEBUG(qstrp);
+			// DEBUGs(qstrp);
 			qstrp = send_recv_2pbk_skt(qstrp);
 			ret = NONE;
 			break;

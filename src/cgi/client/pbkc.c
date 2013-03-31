@@ -48,7 +48,7 @@ main()
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	up             = "UPDATE";
+	up             = "LOOKUP";
 	name           = "pink";
 	last           = "ponk";
 	phonc          = "1000000000";

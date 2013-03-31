@@ -43,7 +43,7 @@ recv_send_2pbk_skt() {
 	 */
 	for(;;) {
 		int done, n, s2;
-		printf("\t\nWaiting for a connection...\n");
+		Dmsg("Waiting for a connection...\n");
 		t = sizeof(remote);
 		/*
 		 * When accept() returns,
@@ -57,19 +57,21 @@ recv_send_2pbk_skt() {
 			perror("accept");
 			exit(1);
 		}
-		printf("\t\nConnected.\n");
+		Dmsg("Connected.\n");
 		done = 0;
 		do {
 			n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
 			bufp[n] = '\0';
-			printf("%7s:%20s:\t%s\n", "skts", "recv()", bufp);
+			Dmsg("recv()\n");
+			DEBUGs(bufp);
 			if (n <= 0) {
 				if (n < 0) perror("recv");
 				done = 1;
 			}
 			if (!done) {
+				DEBUGs(bufp);
 				bufp   = parse_op(bufp);
-				printf("%7s:%20s:\t%s\n", "skts", "send()", bufp);
+				Dmsg("send()\n");
 				if (send(s2, bufp, n, 0) < 0) {
 					perror("send");
 					done = 1;
@@ -82,11 +84,14 @@ recv_send_2pbk_skt() {
 // TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
+	Dmsg("in pars_op\n");
 	tnode *qnode = NULL;
 	qnode = l2node(buf, delim);
 	switch (qnode->op) {
 		case LOOKUP:
-			qnode = lookup(root, qnode);
+			Dmsg("calling lookup from parse_op\n");
+			if ((qnode = lookup(root, qnode)) != NULL)
+				buf = node2line(qnode, delim, buf);
 			break;
 		case UPDATE: /* update will lookup */
 			qnode = update_node(root, qnode);
@@ -94,6 +99,5 @@ parse_op(char *buf) {
 		default:
 			break;
 	}
-	buf = node2line(qnode, delim, buf);
 	return buf;
 }

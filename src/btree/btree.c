@@ -52,7 +52,6 @@ l2node(char *l, char *delim) {
 				i++, tokenp = strtok(NULL, delim)) {
 			switch (i) {
 				case OP:
-				case PHON:
 					op = atoll(tokenp);
 					/* every input goes
 					 * through this point
@@ -66,7 +65,14 @@ l2node(char *l, char *delim) {
 						i    = PHON;
 					} else if (isop(op))
 						;
+					else
+						op   = NONE;
 					break;
+				case PHON:
+					if (isphon(op)) {
+						phon = op;
+						op   = NONE;
+					}
 				case NAME:
 					strcpy(name, tokenp);
 					break;
@@ -86,7 +92,7 @@ l2node(char *l, char *delim) {
 void
 ugrow_btree(tnode *root, FILE *dbfp) {
 	// treeprint(root, PRE);
-	printf("\n\twriting data to file...\n\n");
+	Dmsg("Writing to file...\n");
 	tree_fprintf(root, PRE, dbfp);
 }
 
@@ -162,30 +168,42 @@ ins_node(tnode *root, tnode *node) {
  * for invetory reasons
  */
 
+
 tnode *
 lookup(tnode *root, tnode *q) {
-	int cond;
-	/* DEBUG:
-	 * treeprint(root, PRE);
-	 * printf("lookup: tree\n");
-	 */
-	if (root == NULL) {
-		q = mk_node(root, NONE, q->count, S_PHON, NULL, NULL);
-		return q;
-		/* ishit? keep track */
-	} else if ((cond = strcmp(q->name, root->name)) == 0) {
-		q->count++;
-		/* ismatch? return */
-		if ((cond = strcmp(q->last, root->last)) == 0) {
-			return (q = root);
-		} else if (cond < 0)
-			return lookup(root->left, q);
-		else
-			return lookup(root->right, q);
-	} else if (cond < 0)
+	if (root == NULL)
+		return root;
+	int matched;
+	DEBUGs(q->name);
+	DEBUGs(q->last);
+	Dmsg("tree from here\n");
+	treeprint(root, PRE);
+	matched = ismatch(root, q);
+	if (matched == (NAME + LAST)) {
+		Dmsg("found a match\n");
+		return root;
+	}
+	else if (matched < 0) {
+		Dmsg("left <- less\n");
 		return lookup(root->left, q);
-	else
+	} else {
+		Dmsg("more -> right\n");
 		return lookup(root->right, q);
+	}
+}
+
+unsigned int
+ismatch(tnode *root, tnode *q) {
+	int ncmp = strcmp(q->name, root->name);
+	int lcmp = strcmp(q->last, root->last);
+	if ((ncmp == 0) && (lcmp == 0))
+		return (NAME + LAST);
+	else if (ncmp == 0)
+		return (NAME);
+	else if (lcmp == 0)
+		return (LAST);
+	else
+		return NONE;
 }
 
 tnode *
@@ -247,6 +265,8 @@ node_printf(tnode *node) {
 
 char *
 node2line(tnode *node, char *delim, char *lbuf) {
+	if (node == NULL)
+		return NULL;
 	lbuf = strcpy(lbuf, nodef_print(node, lbuf, PHON));
 	lbuf = strcat(lbuf, delim);
 	lbuf = strcat(lbuf, nodef_print(node, NULL, NAME));
@@ -257,6 +277,8 @@ node2line(tnode *node, char *delim, char *lbuf) {
 
 char *
 nodef_print(tnode *node, char *phon, int prm) {
+	if (node == NULL)
+		return NULL;
 	if (node->name != NULL)
 		switch (prm) {
 			case PHON:

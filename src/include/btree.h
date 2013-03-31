@@ -43,24 +43,25 @@ struct tnode {                    /* the tree node: */
 };
 
 extern tnode        *grow_btree(FILE *, tnode *);
-extern void         ugrow_btree(tnode *, FILE *);
+extern void          ugrow_btree(tnode *, FILE *);
 extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
-extern unsigned int ins_node(tnode *, tnode *);
+extern unsigned int  ins_node(tnode *, tnode *);
 extern tnode        *mk_node(tnode *, unsigned short op, int count, long long ph, char *n, char *l);
 extern tnode        *lookup(tnode *, tnode *);
-extern int          fgetline(FILE *fp, char line[], int max);
-extern void         treeprint(tnode *, int);
-extern void         tree_fprintf(tnode *, int, FILE *);
-extern void         node_fprintf(tnode *, int, FILE *);
-extern void         node_printf(tnode *);
-extern void         hit_print(tnode *);
-extern char  *       nodef_print(tnode *, char *, int);
-extern char  *      node2line(tnode *, char *delim, char *l);
-extern tnode *      l2node(char *l, char *delim);
-extern tnode *      update_node(tnode *, tnode *);
-unsigned short int  isop(long long);
-extern char  *      mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last);
+extern unsigned int  ismatch(tnode *, tnode *);
+extern int           fgetline(FILE *fp, char line[], int max);
+extern void          treeprint(tnode *, int);
+extern void          tree_fprintf(tnode *, int, FILE *);
+extern void          node_fprintf(tnode *, int, FILE *);
+extern void          node_printf(tnode *);
+extern void          hit_print(tnode *);
+extern char         *nodef_print(tnode *, char *, int);
+extern char         *node2line(tnode *, char *delim, char *l);
+extern tnode        *l2node(char *l, char *delim);
+extern tnode        *update_node(tnode *, tnode *);
+unsigned short int   isop(long long);
+extern char         *mk_btreel(char *l, char *delim, const int op, const char *phon, const char   *name, const char *last);
 
 /* http://users.powernet.co.uk/eton/kandr2/krx412.html */
 char *utoa(unsigned long long value, char *digits, int base);
