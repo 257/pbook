@@ -178,32 +178,30 @@ lookup(tnode *root, tnode *q) {
 	DEBUGs(q->last);
 	Dmsg("tree from here\n");
 	treeprint(root, PRE);
-	matched = ismatch(root, q);
-	if (matched == (NAME + LAST)) {
-		Dmsg("found a match\n");
-		return root;
+	matched = isnmatch(root, q);
+	if (matched == 0) {
+		Dmsg("name matches\n");
+		if ((matched = islmatch(root, q)) == 0)
+			return root;
+		else
+			if (matched < 0)
+				return lookup(root->left, q);
+			else
+				return lookup(root->right, q);
 	}
-	else if (matched < 0) {
-		Dmsg("left <- less\n");
+	else if (matched < 0)
 		return lookup(root->left, q);
-	} else {
-		Dmsg("more -> right\n");
+	else
 		return lookup(root->right, q);
-	}
 }
 
 unsigned int
-ismatch(tnode *root, tnode *q) {
-	int ncmp = strcmp(q->name, root->name);
-	int lcmp = strcmp(q->last, root->last);
-	if ((ncmp == 0) && (lcmp == 0))
-		return (NAME + LAST);
-	else if (ncmp == 0)
-		return (NAME);
-	else if (lcmp == 0)
-		return (LAST);
-	else
-		return NONE;
+isnmatch(tnode *root, tnode *q) {
+	return strcmp(q->name, root->name);
+}
+unsigned int
+islmatch(tnode *root, tnode *q) {
+	return strcmp(q->last, root->last);
 }
 
 tnode *
