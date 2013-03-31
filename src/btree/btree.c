@@ -179,8 +179,7 @@ lookup(tnode *root, tnode *q) {
 	Dmsg("tree from here\n");
 	treeprint(root, PRE);
 	matched = isnmatch(root, q);
-	if (matched == 0) {
-		Dmsg("name matches\n");
+	if (matched == 0)
 		if ((matched = islmatch(root, q)) == 0)
 			return root;
 		else
@@ -188,17 +187,18 @@ lookup(tnode *root, tnode *q) {
 				return lookup(root->left, q);
 			else
 				return lookup(root->right, q);
-	}
 	else if (matched < 0)
 		return lookup(root->left, q);
 	else
 		return lookup(root->right, q);
 }
 
+/* TODO: !function */
 unsigned int
 isnmatch(tnode *root, tnode *q) {
 	return strcmp(q->name, root->name);
 }
+/* TODO: !function */
 unsigned int
 islmatch(tnode *root, tnode *q) {
 	return strcmp(q->last, root->last);
