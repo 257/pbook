@@ -49,9 +49,9 @@ main()
 	phonc = cgigetval("phon");
 
 	up             = "LOOKUP";
-	name           = "pink";
-	last           = "ponk";
-	phonc          = "1000000000";
+	name           = "ponk";
+	last           = "pink";
+	phonc          = "5143169147";
 //1111111000:ponk:pink
 
 	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))

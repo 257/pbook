@@ -46,6 +46,7 @@ l2node(char *l, char *delim) {
 	char *tokenp;
 	int i  = OP;
 	long long op = NONE;
+	DEBUGs(l);
 	if (isdigit(l[0])) {
 		for(tokenp = strtok(l, delim);
 				tokenp != NULL && i <= LAST;
@@ -53,25 +54,23 @@ l2node(char *l, char *delim) {
 			switch (i) {
 				case OP:
 					op = atoll(tokenp);
-					/* every input goes
-					 * through this point
-					 * or does it?
-					 * so we check for sanity
-					 * once and for all here
-					 */
 					if (isphon(op)) {
+						Dmsg(isphon);
 						phon = op;
 						op   = NONE;
 						i    = PHON;
-					} else if (isop(op))
+					} else if (isop(op)) {
+						Dmsg(isop);
+						DEBUGlld(op);
 						;
-					else
+					} else {
 						op   = NONE;
+					}
 					break;
 				case PHON:
+					phon = atoll(tokenp);
 					if (isphon(op)) {
 						phon = op;
-						op   = NONE;
 					}
 				case NAME:
 					//strcpy(name, tokenp);
@@ -93,7 +92,6 @@ l2node(char *l, char *delim) {
 }
 void
 ugrow_btree(tnode *root, FILE *dbfp) {
-	// treeprint(root, PRE);
 	Dmsg(Writing to file...);
 	tree_fprintf(root, PRE, dbfp);
 }
@@ -136,21 +134,26 @@ int
 ins_node(tnode *root, tnode *node) {
 	int ret;
 	DEBUGfunch(ins_node);
-	tnode *place_in_tree = lookup(root, node);
-	if (place_in_tree == NULL) {
+	tnode **place_in_tree = lookup(root, node);
+	if ((*place_in_tree) == NULL) {
 		Dmsg(NO match inserting here);
-		place_in_tree = node;
+		tnode *nnode = NULL;
+		nnode = mk_node(nnode, NONE, 1, node->phon, node->name, node->last);
+		(*place_in_tree) = nnode;
 		ret  = INS;
 	} else {
 		Dmsg(found a match updating);
-		place_in_tree->phon = node->phon;
+		// printf("%lld\n", node->phon);
+		(*place_in_tree)->phon = node->phon;
+		// printf("%lld\n", (*place_in_tree)->phon);
 		ret  = UPDATE;
 	}
 	return ret;
 }
+/*
 tnode *
 update_node(tnode *root, tnode *update_node) {
-	tnode *q = NULL;
+	tnode **q = NULL;
 	q = update_node;
 	q = lookup(root, q);
 	switch (q->count) {
@@ -160,7 +163,6 @@ update_node(tnode *root, tnode *update_node) {
 			else
 				q->phon = update_node->phon;
 			break;
-			/* TODO: *commit* after update */
 		case NOHITS:
 		default:
 			update_node->name = strcpy(update_node->name, "record !here");
@@ -169,20 +171,21 @@ update_node(tnode *root, tnode *update_node) {
 	}
 	return update_node;
 }
+*/
 
-tnode *
+tnode **
 lookup(tnode *root, tnode *q) {
-	DEBUGs(q->name);
-	DEBUGs(q->last);
-	Dmsg(tree from here);
-	treeprint(root, PRE);
+	tnode **rootp = NULL;
+	// DEBUGs(q->name);
+	// DEBUGs(q->last);
+	// Dmsg(tree from here);
 	if (root == NULL)
-		return root;
+		return (rootp = &root);
 	int nmatched;
 	int lmatched;
 	if ((nmatched = isnmatch(q)) == 0)
 		if ((lmatched = islmatch(q)) == 0)
-			return root;
+			return (rootp = &root);
 		else
 			if (lmatched < 0)
 				return lookup(root->left, q);

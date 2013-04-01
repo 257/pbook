@@ -1,7 +1,6 @@
 #include "skts.h"
 #include "ansi_colours.h"
-
-tnode *redun = NULL;
+#include "init_pbook.h"
 
 /* TODO: move to skt.c */
 int
@@ -88,23 +87,27 @@ recv_send_2pbk_skt() {
 // TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
-	tnode *qnode;
+	int insbit;
+	tnode *qnode   = NULL;
+	tnode *redun   = NULL;
+	tnode **qnodep = NULL;
+	redun = mk_node(redun, NONE, NONE, NONE, "nil", "nil");
 	Dmsg(in pars_op before l2node);
 	qnode = l2node(buf, delim);
+	DEBUGlld(qnode->phon);
 	Dmsg(in pars_op after l2node);
-	tnode *qnodep = qnode;
-	if (redun == NULL)
-		redun = mk_node(redun, NONE, NONE, NONE, "nil", "nil");
-	int insbit;
 	switch (qnode->op) {
 		case LOOKUP:
-			if ((qnodep = lookup(root, qnodep)) != NULL) {
+			if ((*(qnodep = lookup(root, qnode))) != NULL) {
 				Dmsg(in parse_op afte lookup);
-				buf = node2line(qnodep, delim, buf);
+				buf = node2line((*qnodep), delim, buf);
 			}
 			else {
-				strcpy(redun->name, Alice);
-				strcpy(redun->last, Alice);
+				/* can't use const Alice here, we get
+				 * mem corruption on the second call
+				 */
+				//strcpy(redun->name, "Alice doesnt live here");
+				//strcpy(redun->last, "Alice doesnt live here");
 				buf = node2line(redun, delim, buf);
 			}
 			break;
@@ -113,12 +116,13 @@ parse_op(char *buf) {
 			switch (insbit) {
 				case INS:
 					redun->op = INS;
-					strcpy(redun->name, Alice_Here);
-					strcpy(redun->last, Alice_Here);
+					//strcpy(redun->name, "Alice now lives here");
+					//strcpy(redun->last, "Alice now lives here");
 					buf = node2line(redun, delim, buf);
 				case UPDATE:
-					strcpy(redun->name, "up2date");
-					strcpy(redun->last, "up2date");
+					//strcpy(redun->name, "up2date");
+					//strcpy(redun->last, "up2date");
+					uinit_pbook(root);
 					redun->op = UPDATE;
 					buf = node2line(redun, delim, buf);
 			break;
@@ -126,9 +130,9 @@ parse_op(char *buf) {
 			break;
 			}
 	}
-	free(redun);
-	redun = NULL;
 	free(qnode);
 	qnode = NULL;
+	free(redun);
+	redun = NULL;
 	return buf;
 }

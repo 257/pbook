@@ -49,7 +49,6 @@ struct tnode {                    /* the tree node: */
 	tnode *right;             /* right child */
 };
 
-extern tnode *redun;
 extern tnode *root;
 
 extern tnode        *grow_btree(FILE *, tnode *);
@@ -58,7 +57,7 @@ extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
 extern int           ins_node(tnode *, tnode *);
 extern tnode        *mk_node(tnode *, unsigned short op, int count, long long ph, char *n, char *l);
-extern tnode        *lookup(tnode *, tnode *);
+extern tnode        **lookup(tnode *, tnode *);
 extern int           fgetline(FILE *fp, char line[], int max);
 extern void          treeprint(tnode *, int);
 extern void          tree_fprintf(tnode *, int, FILE *);
