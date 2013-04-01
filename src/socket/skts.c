@@ -87,15 +87,16 @@ recv_send_2pbk_skt() {
 // TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
+	DEBUGfunch(parse_op);
 	int insbit;
 	tnode *qnode   = NULL;
 	tnode *redun   = NULL;
 	tnode **qnodep = NULL;
-	redun = mk_node(redun, NONE, NONE, NONE, "nil", "nil");
+	redun = mk_node(redun, NONE, NONE, NONE, NULL, NULL);
 	Dmsg(in pars_op before l2node);
 	qnode = l2node(buf, delim);
-	DEBUGlld(qnode->phon);
 	Dmsg(in pars_op after l2node);
+	DEBUGlld(qnode->phon);
 	switch (qnode->op) {
 		case LOOKUP:
 			if ((*(qnodep = lookup(root, qnode))) != NULL) {
@@ -108,7 +109,11 @@ parse_op(char *buf) {
 				 */
 				//strcpy(redun->name, "Alice doesnt live here");
 				//strcpy(redun->last, "Alice doesnt live here");
+				Dmsg(qnode is null);
+				free(qnode);
 				buf = node2line(redun, delim, buf);
+				Dmsg(buf assigned redun);
+				free(redun);
 			}
 			break;
 		case UPDATE:

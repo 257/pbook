@@ -42,6 +42,8 @@ mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name
 
 tnode *
 l2node(char *l, char *delim) {
+	DEBUGfunch(l2node);
+	DEBUGs(l);
 	tnode *node = NULL;
 	long long phon = NONE;
 	char *name;
@@ -49,7 +51,6 @@ l2node(char *l, char *delim) {
 	char *tokenp;
 	int i  = OP;
 	long long op = NONE;
-	DEBUGs(l);
 	if (isdigit(l[0])) {
 		for(tokenp = strtok(l, delim);
 				tokenp != NULL && i <= LAST;
@@ -66,8 +67,6 @@ l2node(char *l, char *delim) {
 						Dmsg(isop);
 						DEBUGlld(op);
 						;
-					} else {
-						op   = NONE;
 					}
 					break;
 				case PHON:
@@ -386,8 +385,6 @@ char *itoa(long long value, char *digits, int base)
     utoa(u, d, base);
     return digits;
 }
-
-/* broken i know, would have been a nice analogy */
 
 tnode *
 mk_node(tnode *node, unsigned short op, int count, long long ph, char *n, char *l)  {
