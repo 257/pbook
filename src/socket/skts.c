@@ -74,7 +74,7 @@ recv_send_2pbk_skt() {
 			}
 			if (!done) {
 				DEBUGs(bufp);
-				bufp   = parse_op(bufp);
+				bufp = parse_op(bufp);
 				Dmsg(send());
 				if (send(s2, bufp, n, 0) < 0) {
 					perror("send");
@@ -88,18 +88,23 @@ recv_send_2pbk_skt() {
 // TODO: this doesn't belong here
 char *
 parse_op(char *buf) {
-	Dmsg(in pars_op);
-	tnode *qnode = NULL;
+	tnode *qnode;
+	Dmsg(in pars_op before l2node);
 	qnode = l2node(buf, delim);
-	redun = mk_node(redun, NONE, NONE, NONE, NULL, NULL);
+	Dmsg(in pars_op after l2node);
+	tnode *qnodep = qnode;
+	if (redun == NULL)
+		redun = mk_node(redun, NONE, NONE, NONE, "nil", "nil");
 	int insbit;
 	switch (qnode->op) {
 		case LOOKUP:
-			if ((qnode = lookup(root, qnode)) != NULL)
-				buf = node2line(qnode, delim, buf);
+			if ((qnodep = lookup(root, qnodep)) != NULL) {
+				Dmsg(in parse_op afte lookup);
+				buf = node2line(qnodep, delim, buf);
+			}
 			else {
-				redun->name = Alice;
-				redun->last = Alice;
+				strcpy(redun->name, Alice);
+				strcpy(redun->last, Alice);
 				buf = node2line(redun, delim, buf);
 			}
 			break;
@@ -108,8 +113,12 @@ parse_op(char *buf) {
 			switch (insbit) {
 				case INS:
 					redun->op = INS;
+					strcpy(redun->name, Alice_Here);
+					strcpy(redun->last, Alice_Here);
 					buf = node2line(redun, delim, buf);
 				case UPDATE:
+					strcpy(redun->name, "up2date");
+					strcpy(redun->last, "up2date");
 					redun->op = UPDATE;
 					buf = node2line(redun, delim, buf);
 			break;
@@ -117,5 +126,9 @@ parse_op(char *buf) {
 			break;
 			}
 	}
+	free(redun);
+	redun = NULL;
+	free(qnode);
+	qnode = NULL;
 	return buf;
 }

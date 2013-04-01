@@ -17,7 +17,8 @@
 /* 3 fields, 2 FS, \0 */
 #define MAX_QUERYS_LEN ((4*MAXNAME) + 2 + 1)
 
-#define  Alice      "Alice Doesn't Live Here Anymore"
+#define  Alice      str(Alice Doesnt Live Here Anymore)
+#define  Alice_Here str(Alice lives here now)
 
 extern int     mk_socket(void);
 extern char   *parse_op(char *buf); /* shouldn't be here */

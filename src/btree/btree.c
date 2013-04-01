@@ -136,14 +136,14 @@ int
 ins_node(tnode *root, tnode *node) {
 	int ret;
 	DEBUGfunch(ins_node);
-	tnode **place_in_tree = lookup(root, node);
-	if (*place_in_tree == NULL) {
-		Dmsg(NO math inserting here);
-		*place_in_tree = node;
+	tnode *place_in_tree = lookup(root, node);
+	if (place_in_tree == NULL) {
+		Dmsg(NO match inserting here);
+		place_in_tree = node;
 		ret  = INS;
 	} else {
 		Dmsg(found a match updating);
-		*place_in_tree->phon = node->phon;
+		place_in_tree->phon = node->phon;
 		ret  = UPDATE;
 	}
 	return ret;
@@ -172,14 +172,14 @@ update_node(tnode *root, tnode *update_node) {
 
 tnode *
 lookup(tnode *root, tnode *q) {
-	if (root == NULL)
-		return root;
-	int nmatched;
-	int lmatched;
 	DEBUGs(q->name);
 	DEBUGs(q->last);
 	Dmsg(tree from here);
 	treeprint(root, PRE);
+	if (root == NULL)
+		return root;
+	int nmatched;
+	int lmatched;
 	if ((nmatched = isnmatch(q)) == 0)
 		if ((lmatched = islmatch(q)) == 0)
 			return root;
