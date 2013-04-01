@@ -92,7 +92,9 @@ parse_op(char *buf) {
 	tnode *qnode   = NULL;
 	tnode *redun   = NULL;
 	tnode **qnodep = NULL;
-	redun = mk_node(redun, NONE, NONE, NONE, NULL, NULL);
+	char alice[] = "Alice doesnt live here";
+	char *alicp = alice;
+	redun = mk_node(redun, NONE, NONE, NONE, alicp, alicp);
 	Dmsg(in pars_op before l2node);
 	qnode = l2node(buf, delim);
 	Dmsg(in pars_op after l2node);
@@ -107,10 +109,10 @@ parse_op(char *buf) {
 				/* can't use const Alice here, we get
 				 * mem corruption on the second call
 				 */
-				//strcpy(redun->name, "Alice doesnt live here");
-				//strcpy(redun->last, "Alice doesnt live here");
 				Dmsg(qnode is null);
 				free(qnode);
+				Dmsg(redun is this);
+				treeprint(redun, PRE);
 				buf = node2line(redun, delim, buf);
 				Dmsg(buf assigned redun);
 				free(redun);
