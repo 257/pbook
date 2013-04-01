@@ -13,7 +13,7 @@ mk_socket() {
 }
 
 char *
-send_recv_2pbk_skt(char *qstrp) {
+send_recv_2pbk_skt(char *qstrp, char *bufp) {
 	int s, len;
 	int t;
 	struct sockaddr_un remote;
@@ -27,18 +27,18 @@ send_recv_2pbk_skt(char *qstrp) {
 		perror("connect");
 		exit(1);
 	}
-	
-	/* TODO: write to log */
-	//printf("%7s:%20s:\t%s\n", "sktc", "send()", qstrp);
+	Dmsg(send());
+	DEBUGs(qstrp);
 	if (send(s, qstrp, strlen(qstrp), 0) == -1) {
 		perror("send");
 		exit(1);
 	}
-	if ((t = recv(s, qstrp, MAX_QUERYS_LEN, 0)) > 0) {
-		qstrp[t] = '\0';
-		// TODO: take this out when you're done
-		//printf("%7s:%20s:\t%s\n", "sktc", "recv()", qstrp);
-		return qstrp;
+	DEBUGs(bufp);
+	if ((t = recv(s, bufp, MAX_QUERYS_LEN, 0)) > 0) {
+		Dmsg(recv());
+		bufp[t] = '\0';
+		DEBUGs(bufp);
+		return bufp;
 	} else {
 		if (t < 0) perror("recv");
 		/* TODO: write to log */

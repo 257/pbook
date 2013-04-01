@@ -9,6 +9,7 @@
 
 #include "ansi_colours.h"
 #include "pbc_helpers.h"
+#include "debug.h"
 
 /* only thing we need from btree.h, so far */
 /* TODO: there is more define delim */
@@ -29,6 +30,7 @@
 int
 main()
 {
+	DEBUGfunch(main in pbck);
 	html_header("pbook");
 
 	char *up    = NULL;
@@ -36,7 +38,7 @@ main()
 	char *last  = NULL;
 	char *phonc = NULL;
 
-	char qstr[MAX_QUERYS_LEN];
+	char qstr[MAX_QUERYS_LEN] = {0};
 	char *qstrp;
 	qstrp = qstr;
 	// int op = NONE;
@@ -51,7 +53,7 @@ main()
 	up             = "LOOKUP";
 	name           = "pink";
 	last           = "ponk";
-	phonc          = "5140000000";
+	phonc          = "5140000001";
 
 	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
 		goto footer;

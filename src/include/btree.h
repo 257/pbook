@@ -10,7 +10,6 @@
 
 enum order { PRE, IN, POST };
 enum hit   { NOHITS, HITS };
-enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
 
 #define BPHN   BOP
 
@@ -21,7 +20,7 @@ enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
 #define name_up2date(...)    strcpy(__VA_ARGS__->name, "already up2date")
 #define last_up2date(...)    strcpy(__VA_ARGS__->last, "already up2date")
 #define  all_up2date(...)    (name_up2date(__VA_ARGS__), last_up2date(__VA_ARGS__))
-// #define isop(op)   ((op <= NONE) || (BADOP <= op)) ? NONE : op
+
 
 
 extern char *delim;
@@ -56,7 +55,7 @@ extern void          ugrow_btree(tnode *, FILE *);
 extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
 extern int           ins_node(tnode *, tnode *);
-extern tnode        *mk_node(tnode *, unsigned short op, int count, long long ph, char *n, char *l);
+extern tnode        *mk_node(tnode *, int op, int count, long long ph, char *n, char *l);
 extern tnode        **lookup(tnode *, tnode *);
 extern int           fgetline(FILE *fp, char line[], int max);
 extern void          treeprint(tnode *, int);
@@ -65,10 +64,9 @@ extern void          node_fprintf(tnode *, int, FILE *);
 extern void          node_printf(tnode *);
 extern void          hit_print(tnode *);
 extern char         *nodef_print(tnode *, char *, int);
-extern char         *node2line(tnode *, char *delim, char *l);
+extern void          node2line(tnode *, char *delim, char *l);
 extern tnode        *l2node(char *l, char *delim);
 extern tnode        *update_node(tnode *, tnode *);
-extern unsigned short int   isop(long long);
 extern char         *mk_btreel(char *l, char *delim, const int op, const char *phon, const char   *name, const char *last);
 
 /* http://users.powernet.co.uk/eton/kandr2/krx412.html */

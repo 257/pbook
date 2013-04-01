@@ -33,20 +33,27 @@ isfield(char *input, int field) {
 
 int
 parse_up(char *qstrp, int upbit) {
+	DEBUGfunch(parse_up);
 	int ret;
-	qstrp = send_recv_2pbk_skt(qstrp);
-	tnode *retnode = l2node(qstrp, delim);
+	char buf[MAX_QUERYS_LEN] = {0};
+	char *bufp = buf;
+	send_recv_2pbk_skt(qstrp, bufp);
+	tnode *retnode = l2node(bufp, delim);
 	switch (upbit) {
 		case LOOKUP:
 			/* TODO: handle other cases */
-			if (retnode->count == 1) {
-				// DEBUGs(qstrp);
-				PPHON(retnode);
-				ret = 0;
-				break;
-			}
-			else {
-				ret = NONE;
+			switch (retnode->op) {
+				case NONE:
+					ret = 0;
+					break;
+				case LOOKUP:
+					Dmsg(treeprinting retnode);
+					treeprint(retnode, PRE);
+					PPHON(retnode);
+					ret = NONE;
+					break;
+				default:
+					break;
 			}
 		case UPDATE:
 			// DEBUGs(qstrp);

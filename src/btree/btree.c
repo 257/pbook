@@ -42,37 +42,32 @@ mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name
 
 tnode *
 l2node(char *l, char *delim) {
-	DEBUGfunch(l2node);
-	DEBUGs(l);
 	tnode *node = NULL;
 	long long phon = NONE;
 	char *name;
 	char *last;
 	char *tokenp;
 	int i  = OP;
-	long long op = NONE;
+	int op = NONE;
 	if (isdigit(l[0])) {
 		for(tokenp = strtok(l, delim);
 				tokenp != NULL && i <= LAST;
 				i++, tokenp = strtok(NULL, delim)) {
 			switch (i) {
 				case OP:
-					op = atoll(tokenp);
-					if (isphon(op)) {
-						Dmsg(isphon);
-						phon = op;
+					phon = atoll(tokenp);
+					if (isphon(phon)) {
+						Dmsg(!isop);
 						op   = NONE;
 						i    = PHON;
-					} else if (isop(op)) {
-						Dmsg(isop);
-						DEBUGlld(op);
-						;
+					} else {
+						op = tokenp[0] - '0';
 					}
 					break;
 				case PHON:
 					phon = atoll(tokenp);
-					if (isphon(op)) {
-						phon = op;
+					if (isphon(phon)) {
+						;
 					}
 				case NAME:
 					//strcpy(name, tokenp);
@@ -88,7 +83,8 @@ l2node(char *l, char *delim) {
 			}
 		}
 		/* TODO: TOASK: is the cast here called for? */
-		node = mk_node(node, (unsigned short) op, HITS, phon, name, last);
+		node = mk_node(node, op, NONE, phon, name, last);
+ 
 	}
 	return  node;
 }
@@ -99,13 +95,6 @@ ugrow_btree(tnode *root, FILE *dbfp) {
 }
 
 
-unsigned short int
-isop(long long op) {
-	if ((NONE <= op) && (op < BOP))
-		return 1;
-	else
-		return 0;
-}
 /* addnode_2root: add a node with n, at or below p */
 
 tnode *
@@ -233,60 +222,67 @@ node_printf(tnode *node) {
 	nodef_print(node, NULL, LAST));
 }
 
-char *
+void
 node2line(tnode *node, char *delim, char *lbuf) {
-	if (node == NULL)
-		return NULL;
-	lbuf = strcpy(lbuf, nodef_print(node, lbuf, PHON));
-	lbuf = strcat(lbuf, delim);
-	lbuf = strcat(lbuf, nodef_print(node, NULL, NAME));
-	lbuf = strcat(lbuf, delim);
-	lbuf = strcat(lbuf, nodef_print(node, NULL, LAST));
-	return lbuf;
+	DEBUGfunch(node2line);
+	DEBUGs(lbuf);
+	DEBUGd(node->op);
+	strcpy(lbuf, nodef_print(node, lbuf, OP));
+	DEBUGs(lbuf);
+	strcat(lbuf, delim);
+	DEBUGs(lbuf);
+	//strcat(lbuf, nodef_print(node, lbuf, PHON));
+	DEBUGs(lbuf);
+	strcat(lbuf, delim);
+	DEBUGs(lbuf);
+	strcat(lbuf, nodef_print(node, lbuf, NAME));
+	strcat(lbuf, delim);
+	DEBUGs(lbuf);
+	strcat(lbuf, nodef_print(node, lbuf, LAST));
 }
 
 char *
-nodef_print(tnode *node, char *phon, int prm) {
+nodef_print(tnode *node, char *nodefb, int prm) {
 	if (node == NULL)
 		return NULL;
-	if (node->name != NULL)
-		switch (prm) {
-			case PHON:
-				phon = itoa(node->phon, phon, 10);
-				return phon;
-				break;
-			case NAME:
-				return node->name;
-				break;
-			/*
-			case NAME_PHON:
-				nodef_print(node, NAME);
-				nodef_print(node, PHON);
-				break;
-				*/
-			case LAST:
-				return node->last;
-				break;
-			/*
-			case LAST_PHON:
-				nodef_print(node, LAST);
-				nodef_print(node, PHON);
-				break;
-			case LAST_NAME:
-				nodef_print(node, LAST);
-				nodef_print(node, NAME);
-				break;
-			case ALL:
-				nodef_print(node, LAST_NAME);
-				nodef_print(node, PHON);
-				break;
-				*/
-			default:
-				return node->name;
-				break;
-		}
-	else
-		return node->name;
+	switch (prm) {
+		case OP:
+			itoa(node->op, nodefb, 10);
+			break;
+		case PHON:
+			itoa(node->phon, nodefb, 10);
+			break;
+		case NAME:
+			nodefb = node->name;
+			break;
+		/*
+		case NAME_PHON:
+			nodefb_print(node, NAME);
+			nodefb_print(node, PHON);
+			break;
+			*/
+		case LAST:
+			nodefb = node->last;
+			break;
+		/*
+		case LAST_PHON:
+			nodefb_print(node, LAST);
+			nodefb_print(node, PHON);
+			break;
+		case LAST_NAME:
+			nodefb_print(node, LAST);
+			nodefb_print(node, NAME);
+			break;
+		case ALL:
+			nodefb_print(node, LAST_NAME);
+			nodefb_print(node, PHON);
+			break;
+			*/
+		default:
+			nodefb = node->name;
+			break;
+	}
+	return nodefb;
 }
 void
 tree_fprintf(tnode *root, int order, FILE *dbfp) {
@@ -387,7 +383,7 @@ char *itoa(long long value, char *digits, int base)
 }
 
 tnode *
-mk_node(tnode *node, unsigned short op, int count, long long ph, char *n, char *l)  {
+mk_node(tnode *node, int op, int count, long long ph, char *n, char *l)  {
 	node         = talloc();
 	node->op     = op;
 	node->phon   = ph; /* we don't care about BPHN, caller's job */

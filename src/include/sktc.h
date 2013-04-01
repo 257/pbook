@@ -13,6 +13,6 @@
 #include "skt.h"
 
 
-char *send_recv_2pbk_skt(char *);
+extern char *send_recv_2pbk_skt(char *, char*);
 
 #endif
