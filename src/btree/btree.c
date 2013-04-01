@@ -8,6 +8,9 @@ grow_btree(FILE *dbfp, tnode *root) {
 	char entry[MAX_ENTL];
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
 		if(l2node(entry, delim) != NULL)
+			/* TODO: addnode_2root is hereby marked as redundent
+			 * use the better ins_node() function.
+			 */
 			root = addnode_2root(root, l2node(entry, delim));
 	// treeprint(root, PRE);
 	return root;
