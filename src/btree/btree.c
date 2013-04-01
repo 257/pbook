@@ -231,7 +231,7 @@ node2line(tnode *node, char *delim, char *lbuf) {
 	DEBUGs(lbuf);
 	strcat(lbuf, delim);
 	DEBUGs(lbuf);
-	//strcat(lbuf, nodef_print(node, lbuf, PHON));
+	strcat(lbuf, itoa(node->phon, lbuf, 10));
 	DEBUGs(lbuf);
 	strcat(lbuf, delim);
 	DEBUGs(lbuf);
