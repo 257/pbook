@@ -27,10 +27,9 @@ int pb_getline(char line[], int max)
 
 int
 fgetline(FILE *fp, char line[], int max) {
-	DEBUGfunch(fgetline);
 	if(fp == NULL) {
 		Dmsg(fp is null);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	int nch = 0;
 	int c;

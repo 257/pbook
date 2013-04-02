@@ -2,7 +2,8 @@
 #define PB_FS_H
 #include "std_libc.h"
 
-#define PREFIX_CONF        getenv("PWD") /* should be modular via Makefile */
+// #define PREFIX_CONF        getenv("PWD") /* should be modular via Makefile */
+#define PREFIX_CONF        "."
 #define DIR_CONF           "/.config"
 #define DIR_IN_CONF        "/pbook"
 #define DATA_FILE          "/phonebook"
