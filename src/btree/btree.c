@@ -5,9 +5,11 @@ char  *delim = DELIM;
 
 tnode *
 grow_btree(FILE *dbfp, tnode *root) {
+	DEBUGfunch(grow_btree);
 	char entry[MAX_ENTL];
+	char *entryp;
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
-		if(l2node(entry, delim) != NULL)
+		if(l2node(entryp, delim) != NULL)
 			root = addnode_2root(root, l2node(entry, delim));
 	return root;
 }

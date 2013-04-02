@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
+#include <string.h>
 
 #define MAXLINE 100
 #define MAXROWS 10
@@ -68,13 +69,16 @@ return nch;
 
 
 int array[MAXROWS][MAXCOLS];
-char *filename = "input.dat";
+//char *filename = "input.dat";
+char *filename = "phonebook";
 FILE *ifp;
 char line[MAXLINE];
-char *words[MAXCOLS];
+char *words;
 int nrows = 0;
 int n;
 int i;
+
+char *delim = ":";
 
 int
 main() {
@@ -93,11 +97,19 @@ while(fgetline(ifp, line, MAXLINE) != EOF)
 		exit(EXIT_FAILURE);
 		}
 
-	n = getwords(line, words, MAXCOLS);
-
-	for(i = 0; i < n; i++)
+	// n = getwords(line, words, MAXCOLS);
+	/* for(words = strtok(l, " ");
+				words != NULL && i <= LAST;
+				i++, tokenp = strtok(NULL, delim)) {
+				*/
+		
+	/*for(i = 0; i < n; i++)
 		array[nrows][i] = atoi(words[i]);
 	nrows++;
+	*/
+	for(words = strtok(line, delim); words != NULL;
+						words = strtok(NULL, delim))
+			printf("%s\n", words);
 	}
 return 0;
 }

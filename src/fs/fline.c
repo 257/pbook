@@ -1,4 +1,5 @@
 #include "pb_line.h"
+#include "debug.h"
 
 int pb_getline(char line[], int max)
 {
@@ -26,6 +27,11 @@ int pb_getline(char line[], int max)
 
 int
 fgetline(FILE *fp, char line[], int max) {
+	DEBUGfunch(fgetline);
+	if(fp == NULL) {
+		Dmsg(fp is null);
+		return 1;
+	}
 	int nch = 0;
 	int c;
 	max = max - 1; /* leave room for '\0' */
