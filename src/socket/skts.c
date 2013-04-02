@@ -18,14 +18,16 @@ recv_send_2pbk_skt() {
 	DEBUGfunch(recv_send_2pbk_skt);
 	Done();
 	int len;
-	socklen_t t;
-	struct sockaddr_un local, remote;
+	size_t size;
+	struct sockaddr_un local, pbkc;
 	char buf[MAX_QUERYS_LEN] = {0};
 	char *bufp = buf;
-	int s;
+	int sock;
+
+	fd_set active_fd_set, read_fd_set;
 
 	Dmsg(creating the socket);
-	s = mk_socket();
+	sock = mk_socket();
 	Done();
 	
 	local.sun_family = AF_UNIX;
@@ -40,54 +42,77 @@ recv_send_2pbk_skt() {
 
 	if (listen(s, MAX_Q_LEN) == -1) {
 		perror("listen");
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
-	/*
-	 * This will accept a connection from a client.
-	 * This function returns another socket descriptor!
-	 * The old descriptor is still listening for new connections,
-	 * but this new one is connected to the client:
-	 */
+	/* Initialize the set of active sockets. */
+	FD_ZERO (&active_fd_set);
+	FD_SET (stdin, &active_fd_set);
+	FD_SET (pbkc, &active_fd_set);
+	int c;
+
+	int done, n, s2;
 	Dmsg(send 'EOF' with Ctrl-D to stop the daemon or);
 	Dmsg(Press any other key to continue);
-	//int c;
-	int done, n, s2;
-	Dmsg(Waiting for a connection...);
-	t = sizeof(remote);
-	/*
-	 * When accept() returns,
-	 * the remote variable will be filled
-	 * with the remote side's struct sockaddr_un,
-	 * and len will be set to its length.
-	 * The descriptor s2 is connected to the client,
-	 * and is ready for send() and recv()
-	 */
-	if (((s2 = accept(s, (struct sockaddr *)&remote, &t)) != -1) && ((c=getchar()) != EOF)) {
-	Dmsg(Connected.);
-	done = 0;
-	do {
-		DEBUGfunch(recv());
-		n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
-		bufp[n] = '\0';
-		DEBUGs(bufp);
-		if (n <= 0) {
-			if (n < 0) perror("recv");
-			done = 1;
+
+	while(1) {
+		//if (((s2 = accept(s, (struct sockaddr *)&pbkc, &t)) == -1))
+		read_fd_set = active_fd_set;
+		Dmsg(Waiting for a connection...);
+		/* Block until input arrives on one or more active sockets. */
+		if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
+			perror ("select");
+			exit (EXIT_FAILURE);
 		}
-		if (!done) {
-			if (parse_op(bufp) == NONE) {
-				char none[] = "0";
-				char *nonep = none;
-				strcpy(bufp, nonep);
+		/* Service all the sockets with input pending. */
+		for (i = 0; i < FD_SETSIZE; ++i)
+			if (FD_ISSET (i, &read_fd_set)) {
+				if (i == pbkc) {
+					/* Connection request on original socket. */
+					int new;
+					size = sizeof(pbkc);
+					new = accept (sock,
+							(struct sockaddr *) &pbkc,
+							&size);
+					if (new < 0) {
+						perror ("accept");
+						exit (EXIT_FAILURE);
+					}
+					Dmsg(Connected.);
+					FD_SET (new, &active_fd_set);
+
+					done = 0;
+					do {
+						DEBUGfunch(recv());
+						n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
+						bufp[n] = '\0';
+						DEBUGs(bufp);
+						if (n <= 0) {
+							if (n < 0) perror("recv");
+							done = 1;
+						}
+						if (!done) {
+							if (parse_op(bufp) == NONE) {
+								char none[] = "0";
+								char *nonep = none;
+								strcpy(bufp, nonep);
+							}
+							DEBUGfunch(send());
+							DEBUGs(bufp);
+							if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
+								perror("send");
+								done = 1;
+							}
+						}
+					} while (!done);
+				} else {
+					/* Data arriving on an already-connected socket. */
+					if (read_from_client (i) < 0) {
+						close (i);
+						FD_CLR (i, &active_fd_set);
+					}
+				}
 			}
-			DEBUGfunch(send());
-			DEBUGs(bufp);
-			if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
-				perror("send");
-				done = 1;
-			}
-		}
-	} while (!done);
+	}
 
 		perror("accept");
 		exit(1);
