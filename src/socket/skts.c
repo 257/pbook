@@ -48,51 +48,50 @@ recv_send_2pbk_skt() {
 	 * The old descriptor is still listening for new connections,
 	 * but this new one is connected to the client:
 	 */
-	for(;;) {
-		int done, n, s2;
-		Dmsg(Waiting for a connection...);
-		t = sizeof(remote);
-		/*
-		 * When accept() returns,
-		 * the remote variable will be filled
-		 * with the remote side's struct sockaddr_un,
-		 * and len will be set to its length.
-		 * The descriptor s2 is connected to the client,
-		 * and is ready for send() and recv()
-		 */
-		if ((s2 = accept(s, (struct sockaddr *)&remote, &t)) == -1) {
-			perror("accept");
-			exit(1);
+	Dmsg(send 'EOF' with Ctrl-D to stop the daemon or);
+	Dmsg(Press any other key to continue);
+	//int c;
+	int done, n, s2;
+	Dmsg(Waiting for a connection...);
+	t = sizeof(remote);
+	/*
+	 * When accept() returns,
+	 * the remote variable will be filled
+	 * with the remote side's struct sockaddr_un,
+	 * and len will be set to its length.
+	 * The descriptor s2 is connected to the client,
+	 * and is ready for send() and recv()
+	 */
+	if (((s2 = accept(s, (struct sockaddr *)&remote, &t)) != -1) && ((c=getchar()) != EOF)) {
+	Dmsg(Connected.);
+	done = 0;
+	do {
+		DEBUGfunch(recv());
+		n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
+		bufp[n] = '\0';
+		DEBUGs(bufp);
+		if (n <= 0) {
+			if (n < 0) perror("recv");
+			done = 1;
 		}
-		Dmsg(Connected.);
-		int c;
-		done = 0;
-		do {
-			DEBUGfunch(recv());
-			while((c = getchar()) != EOF) {
-				n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
-				bufp[n] = '\0';
-				DEBUGs(bufp);
-				if (n <= 0) {
-					if (n < 0) perror("recv");
-					done = 1;
-				}
-				if (!done) {
-					if (parse_op(bufp) == NONE) {
-						char none[] = "0";
-						char *nonep = none;
-						strcpy(bufp, nonep);
-					}
-					DEBUGfunch(send());
-					DEBUGs(bufp);
-					if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
-						perror("send");
-						done = 1;
-					}
-				}
+		if (!done) {
+			if (parse_op(bufp) == NONE) {
+				char none[] = "0";
+				char *nonep = none;
+				strcpy(bufp, nonep);
 			}
-		} while (!done);
-	}
+			DEBUGfunch(send());
+			DEBUGs(bufp);
+			if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
+				perror("send");
+				done = 1;
+			}
+		}
+	} while (!done);
+
+		perror("accept");
+		exit(1);
+	close(s2);
 }
 
 // TODO: this doesn't belong here

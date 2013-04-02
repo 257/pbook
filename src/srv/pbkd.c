@@ -9,15 +9,11 @@ pbkd(int mode) {
 	Done();
 	switch (mode) {
 		case START:
-			//while ((c = getchar()) != EOF) {
-				Dmsg(started pbd in foreground mode);
-				Dmsg(calling recv_send_2pbk_skt);
-				recv_send_2pbk_skt();
-			//}
-			Dmsg(caught EOF closing pbd);
+			Dmsg(started pbd in foreground mode);
+			Dmsg(calling recv_send_2pbk_skt);
+			recv_send_2pbk_skt();
 			break;
-		case KILL: // for signal(), not implemented 
-			// close(s2);
+		case KILL:
 			break;
 		default:
 			break;
