@@ -15,7 +15,8 @@
 
 enum boolean { FALSE, TRUE };
 extern int   isfield(char *, int);
-extern int   parse_up(char *, int);
+extern char *mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last);
+extern void  parse_up(char *, char *up, char *phonc, char *name, char *last);
 extern int   waz(char *);
 
 #endif

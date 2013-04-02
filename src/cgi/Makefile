@@ -1,4 +1,4 @@
-VPATH          = $(wildcard ./*)
+VPATH          = $(wildcard ./*):$(wildcard ../*)
 SUBDIRS        = .
 
 MAKEFLAGS      = --no-print-directory

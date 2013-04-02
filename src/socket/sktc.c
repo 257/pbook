@@ -27,7 +27,7 @@ send_recv_2pbk_skt(char *qstrp, char *bufp) {
 		perror("connect");
 		exit(1);
 	}
-	Dmsg(send());
+	DEBUGfunch(send());
 	DEBUGs(qstrp);
 	if (send(s, qstrp, strlen(qstrp), 0) == -1) {
 		perror("send");
@@ -35,7 +35,7 @@ send_recv_2pbk_skt(char *qstrp, char *bufp) {
 	}
 	DEBUGs(bufp);
 	if ((t = recv(s, bufp, MAX_QUERYS_LEN, 0)) > 0) {
-		Dmsg(recv());
+		DEBUGfunch(recv());
 		bufp[t] = '\0';
 		DEBUGs(bufp);
 		return bufp;

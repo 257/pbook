@@ -72,10 +72,14 @@ recv_send_2pbk_skt() {
 				done = 1;
 			}
 			if (!done) {
-				bufp = parse_op(bufp);
+				if (parse_op(bufp) == NONE) {
+					char none[] = "0";
+					char *nonep = none;
+					strcpy(bufp, nonep);
+				}
 				DEBUGfunch(send());
 				DEBUGs(bufp);
-				if (send(s2, bufp, n, 0) < 0) {
+				if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
 					perror("send");
 					done = 1;
 				}
@@ -85,43 +89,36 @@ recv_send_2pbk_skt() {
 }
 
 // TODO: this doesn't belong here
-char *
-parse_op(char *buf) {
+int
+parse_op(char *bufp) {
 	int insbit;
 	tnode *qn   = NULL;
 	tnode **qnp = NULL;
 
-	char noalcn[] = "No";
-	char noalcl[] = "Alice";
-
-	tnode *noalc = NULL;
-
-	qn = l2node(buf, delim);
+	qn = l2node(bufp, delim);
 	switch (qn->op) {
 		case LOOKUP:
 			if ((*(qnp = lookup(root, qn))) != NULL)
-				node2line((*qnp), delim, buf);
+				bufp = nodef_print((*qnp), bufp, PHON);
 			else
-				noalc = mk_node(noalc, NONE, NONE, qn->phon, noalcn, noalcl);
-				node2line(noalc, delim, buf);
+				insbit = NONE;
 			break;
 		case UPDATE:
 			insbit = ins_node(root, qn);
+			uinit_pbook(root);
 			switch (insbit) {
 				case INS:
-					qn->op = INS;
-					node2line(qn, delim, buf);
+					insbit = NONE;
+					break;
 				case UPDATE:
-					uinit_pbook(root);
-					qn->op = UPDATE;
-					node2line(qn, delim, buf);
-			break;
+					insbit = UPDATE;
+					break;
+				default:
+					break;
+			}
 		default:
 			break;
-			}
 	}
 	free(qn);
-	free(noalc);
-	DEBUGs(buf);
-	return buf;
+	return insbit;
 }

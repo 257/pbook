@@ -37,7 +37,6 @@ SRV_PATH      = ./srv
 
 .PHONY:         clean cleano distclean
 clean:
-	rm $(objects) && \
-	$(MAKE) -C $(SRV_PATH) $@
+	-rm $(objects)
 distclean:
-	$(MAKE) -C $(SRV_PATH) $@ && rm $(EXENAME) $(objects)
+	-rm $(EXENAME) $(objects)

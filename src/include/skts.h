@@ -4,6 +4,6 @@
 #include "skt.h"
 
 extern void    recv_send_2pbk_skt(void);
-extern char   *parse_op(char *buf); /* shouldn't be here */
+extern int     parse_op(char *buf); /* shouldn't be here */
 
 #endif

@@ -31,38 +31,33 @@ isfield(char *input, int field) {
 	return ret;
 }
 
-int
-parse_up(char *qstrp, int upbit) {
-	DEBUGfunch(parse_up);
-	int ret;
+void
+parse_up(char *qstrp, char *up, char *phonc, char *name, char *last) {
+	char noalice[]    = "Alice doesn't live here anymore!\n";
+	char havealice[] = "now lives here\n";
+	char upalice[]   = "up2date\n";
+	int upbit = waz(up);
+	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
 	char buf[MAX_QUERYS_LEN] = {0};
 	char *bufp = buf;
 	send_recv_2pbk_skt(qstrp, bufp);
-	tnode *retnode = l2node(bufp, delim);
 	switch (upbit) {
 		case LOOKUP:
-			/* TODO: handle other cases */
-			switch (retnode->op) {
-				case NONE:
-					ret = 0;
-					break;
-				case LOOKUP:
-					Dmsg(treeprinting retnode);
-					treeprint(retnode, PRE);
-					PPHON(retnode);
-					ret = NONE;
-					break;
-				default:
-					break;
-			}
+			if ((buf[0] - '0') == 0)
+				printf("%s", noalice);
+			//tnode *retnode = l2node(bufp, delim);
+			else
+				printf("%s\n", bufp);
+			break;
 		case UPDATE:
-			// DEBUGs(qstrp);
-			ret = NONE;
+			if ((buf[0] - '0') == 0)
+				printf("%s %s %s", name, last, havealice);
+			else
+				printf("%s %s %s %s", name, last, phonc, upalice);
 			break;
 		default:
 			break;
 	}
-	return ret;
 }
 
 int
@@ -72,4 +67,25 @@ waz(char *up) {
 	upbit = (strcmp(up , "LOOKUP")) ? upbit : LOOKUP;
 	upbit = (strcmp(up , "UPDATE")) ? upbit : UPDATE;
 	return upbit;
+}
+
+char *
+mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last) {
+	switch (op) {
+		case LOOKUP:
+			l = strcpy(l, "1");
+			break;
+		case UPDATE:
+			l = strcpy(l, "3");
+			break;
+		default:
+			break;
+	}
+	l = strcat(l, delim);
+	l = strcat(l, phon);
+	l = strcat(l, delim);
+	l = strcat(l, name);
+	l = strcat(l, delim);
+	l = strcat(l, last);
+	return l;
 }

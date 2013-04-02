@@ -8,37 +8,9 @@ grow_btree(FILE *dbfp, tnode *root) {
 	char entry[MAX_ENTL];
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
 		if(l2node(entry, delim) != NULL)
-			/* TODO: addnode_2root is hereby marked as redundent
-			 * use the better ins_node() function.
-			 */
 			root = addnode_2root(root, l2node(entry, delim));
-	// treeprint(root, PRE);
 	return root;
 }
-
-/* TODO: this doeesn't belong here; client side stuff*/
-char *
-mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last) {
-	switch (op) {
-		case LOOKUP:
-			l = strcpy(l, "1");
-			break;
-		case UPDATE:
-			l = strcpy(l, "3");
-			break;
-		default:
-			break;
-	}
-	l = strcat(l, delim);
-	l = strcat(l, phon);
-	l = strcat(l, delim);
-	l = strcat(l, name);
-	l = strcat(l, delim);
-	l = strcat(l, last);
-	return l;
-}
-
-// TODO: isline()
 
 tnode *
 l2node(char *l, char *delim) {
@@ -57,7 +29,6 @@ l2node(char *l, char *delim) {
 				case OP:
 					phon = atoll(tokenp);
 					if (isphon(phon)) {
-						Dmsg(!isop);
 						op   = NONE;
 						i    = PHON;
 					} else {
@@ -94,7 +65,6 @@ ugrow_btree(tnode *root, FILE *dbfp) {
 	tree_fprintf(root, PRE, dbfp);
 }
 
-
 /* addnode_2root: add a node with n, at or below p */
 
 tnode *
@@ -123,53 +93,27 @@ addnode_2root(tnode *root, tnode *node) {
 
 int
 ins_node(tnode *root, tnode *node) {
-	int ret;
-	DEBUGfunch(ins_node);
+	int insbit;
 	tnode **place_in_tree = lookup(root, node);
 	if ((*place_in_tree) == NULL) {
 		Dmsg(NO match inserting here);
 		tnode *nnode = NULL;
-		nnode = mk_node(nnode, NONE, 1, node->phon, node->name, node->last);
-		(*place_in_tree) = nnode;
-		ret  = INS;
+		nnode = mk_node(nnode, NONE, NONE, node->phon, node->name, node->last);
+		root = addnode_2root(root, nnode);
+		// (*place_in_tree) = nnode;
+		treeprint(root, IN);
+		insbit  = INS;
 	} else {
 		Dmsg(found a match updating);
-		// printf("%lld\n", node->phon);
 		(*place_in_tree)->phon = node->phon;
-		// printf("%lld\n", (*place_in_tree)->phon);
-		ret  = UPDATE;
+		insbit  = UPDATE;
 	}
-	return ret;
+	return insbit;
 }
-/*
-tnode *
-update_node(tnode *root, tnode *update_node) {
-	tnode **q = NULL;
-	q = update_node;
-	q = lookup(root, q);
-	switch (q->count) {
-		case HITS:
-			if (q->phon == update_node->phon)
-				all_up2date(update_node);
-			else
-				q->phon = update_node->phon;
-			break;
-		case NOHITS:
-		default:
-			update_node->name = strcpy(update_node->name, "record !here");
-			update_node->last = strcpy(update_node->last, "record !here");
-			break;
-	}
-	return update_node;
-}
-*/
 
 tnode **
 lookup(tnode *root, tnode *q) {
 	tnode **rootp = NULL;
-	// DEBUGs(q->name);
-	// DEBUGs(q->last);
-	// Dmsg(tree from here);
 	if (root == NULL)
 		return (rootp = &root);
 	int nmatched;
@@ -222,67 +166,67 @@ node_printf(tnode *node) {
 	nodef_print(node, NULL, LAST));
 }
 
-void
+char *
 node2line(tnode *node, char *delim, char *lbuf) {
+	if (node == NULL)
+		return NULL;
 	DEBUGfunch(node2line);
-	DEBUGs(lbuf);
 	DEBUGd(node->op);
-	strcpy(lbuf, nodef_print(node, lbuf, OP));
+	lbuf = strcpy(lbuf, nodef_print(node, lbuf, OP));
+	lbuf = strcat(lbuf, delim);
 	DEBUGs(lbuf);
-	strcat(lbuf, delim);
+	lbuf = strcat(lbuf, nodef_print(node, lbuf, PHON));
+	lbuf = strcat(lbuf, delim);
 	DEBUGs(lbuf);
-	strcat(lbuf, itoa(node->phon, lbuf, 10));
+	lbuf = strcat(lbuf, nodef_print(node, lbuf, NAME));
+	lbuf = strcat(lbuf, delim);
 	DEBUGs(lbuf);
-	strcat(lbuf, delim);
-	DEBUGs(lbuf);
-	strcat(lbuf, nodef_print(node, lbuf, NAME));
-	strcat(lbuf, delim);
-	DEBUGs(lbuf);
-	strcat(lbuf, nodef_print(node, lbuf, LAST));
+	lbuf = strcat(lbuf, nodef_print(node, lbuf, LAST));
+	return lbuf;
 }
 
 char *
-nodef_print(tnode *node, char *nodefb, int prm) {
+nodef_print(tnode *node, char *nodef, int prm) {
 	if (node == NULL)
 		return NULL;
 	switch (prm) {
 		case OP:
-			itoa(node->op, nodefb, 10);
+			nodef = itoa(node->op, nodef, 10);
 			break;
 		case PHON:
-			itoa(node->phon, nodefb, 10);
+			nodef = itoa(node->phon, nodef, 10);
 			break;
 		case NAME:
-			nodefb = node->name;
+			nodef = node->name;
 			break;
 		/*
 		case NAME_PHON:
-			nodefb_print(node, NAME);
-			nodefb_print(node, PHON);
+			nodef_print(node, NAME);
+			nodef_print(node, PHON);
 			break;
 			*/
 		case LAST:
-			nodefb = node->last;
+			nodef = node->last;
 			break;
 		/*
 		case LAST_PHON:
-			nodefb_print(node, LAST);
-			nodefb_print(node, PHON);
+			nodef_print(node, LAST);
+			nodef_print(node, PHON);
 			break;
 		case LAST_NAME:
-			nodefb_print(node, LAST);
-			nodefb_print(node, NAME);
+			nodef_print(node, LAST);
+			nodef_print(node, NAME);
 			break;
 		case ALL:
-			nodefb_print(node, LAST_NAME);
-			nodefb_print(node, PHON);
+			nodef_print(node, LAST_NAME);
+			nodef_print(node, PHON);
 			break;
 			*/
 		default:
-			nodefb = node->name;
+			nodef = node->name;
 			break;
 	}
-	return nodefb;
+	return nodef;
 }
 void
 tree_fprintf(tnode *root, int order, FILE *dbfp) {

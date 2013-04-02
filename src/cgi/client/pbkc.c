@@ -4,28 +4,11 @@
 
 #include "sktc.h"
 #include "cgigetval.h"
-#include "btree.h"
 #include "html.h"
 
 #include "ansi_colours.h"
 #include "pbc_helpers.h"
 #include "debug.h"
-
-/* only thing we need from btree.h, so far */
-/* TODO: there is more define delim */
-// enum op    { NONE, LOOKUP, INS, UPDATE, DEL, BOP};
-
-
-/* TODO: ntime, ideally this should be hidden
- * away to keep main() only talking to 
- * http srv and hand stuff to modules that
- * know how to speak btree
- * that module would use a fairly general
- * socket module to communicate with
- * btree's socket
- * then we don't have to write code with
- * crap like ":" in it.
- */
 
 int
 main()
@@ -41,32 +24,26 @@ main()
 	char qstr[MAX_QUERYS_LEN] = {0};
 	char *qstrp;
 	qstrp = qstr;
-	// int op = NONE;
-	// long long phon = atoll(input);
-
 
 	up    = cgigetval("op");
 	name  = cgigetval("name");
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	up             = "LOOKUP";
-	name           = "pink";
-	last           = "ponk";
-	phonc          = "5140000001";
-
-	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
-		goto footer;
-
-	int upbit = waz(up);
-	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
-	parse_up(qstrp, upbit);
-	/* i could just pass query pbkd for *root and then
-	 * do btree operations on right here, right now
-	 * but that needs a shared memory implementation
-	 * again notime.
-	 * we're gonna use unix domain sockets, simpler
+	/*
+	 * up             = "LOOKUP";
+	 * name           = "qui";
+	 * last           = "qoo";
+	 * phonc          = "1011111111";
 	 */
+
+	/* TODO: what is this? wrap this away */
+	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST))) {
+		printf("bad input\n");
+		goto footer;
+	}
+
+	parse_up(qstrp, up, phonc, name, last);
 footer:
 	html_footer();
 	return 0;

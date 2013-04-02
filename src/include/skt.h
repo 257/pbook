@@ -21,7 +21,6 @@
 #define  Alice_Here str(Alice lives here now)
 
 extern int     mk_socket(void);
-extern char   *parse_op(char *buf); /* shouldn't be here */
 
 
 #endif
