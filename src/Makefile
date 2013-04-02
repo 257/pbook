@@ -14,7 +14,7 @@ CFLAGS         = -I$(include_dirs) \
 		 -std=$(CSTD) \
 		 -g \
 		 -Wall
-
+EXENAME       = pbook
 include_dirs  = ./include
 objects       = \
 		pb_limits.o \
@@ -29,6 +29,7 @@ objects       = \
 pbook:           $(objects)
 	cc -o $@ $(objects) && \
 		$(MAKE) -C $(PWD) clean
+
 
 SRV_PATH      = ./srv
 #pbkd.o:

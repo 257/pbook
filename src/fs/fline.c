@@ -29,7 +29,7 @@ fgetline(FILE *fp, char line[], int max) {
 	int nch = 0;
 	int c;
 	max = max - 1; /* leave room for '\0' */
-		while((c = getc(fp)) != EOF) {
+		while((c = fgetc(fp)) != EOF) {
 			if(c == '\n')
 				break;
 			if(nch < max) {

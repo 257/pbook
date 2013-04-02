@@ -14,6 +14,7 @@ objects       = \
 
 pbkd:         $(objects)
 	@printf "  DONE:  pbkd.o\n"
+
 .PHONY:         clean cleano distclean
 clean:
 	-rm $(objects)

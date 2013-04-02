@@ -1,6 +1,7 @@
 #include "init_pbook.h"
 #include "ui.h"
 #include "pbkd.h"
+#include "debug.h"
 
 tnode *root = NULL;
 

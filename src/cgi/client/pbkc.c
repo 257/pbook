@@ -13,7 +13,6 @@
 int
 main()
 {
-	DEBUGfunch(main in pbck);
 	html_header("pbook");
 
 	char *up    = NULL;
@@ -30,19 +29,14 @@ main()
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	/*
-	 * up             = "LOOKUP";
-	 * name           = "qui";
-	 * last           = "qoo";
-	 * phonc          = "1011111111";
-	 */
+	up             = "LOOKUP";
+	name           = "qui";
+	last           = "qoo";
+	phonc          = "1011111111";
 
 	/* TODO: what is this? wrap this away */
-	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST))) {
-		printf("bad input\n");
+	if ((!isfield(up, OP) || !isfield(phonc, PHON) || !isfield(name, NAME) || !isfield(last, LAST)))
 		goto footer;
-	}
-
 	parse_up(qstrp, up, phonc, name, last);
 footer:
 	html_footer();

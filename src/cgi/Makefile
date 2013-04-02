@@ -21,14 +21,16 @@ objects       = \
 		xctod.o \
 		pbc_helpers.o
 
-EXENAME        = pbkc
+EXENAME        = pbkc.cgi
 pbkc.cgi:           $(objects)
 	cc -o $@ $(objects) && $(MAKE) -C . cleano
 	
 	
 
-cgi:            pbook
-	cp pbook pbook.cgi
+CGI_PATH      = public_html/cgi-bin
+install:      pbkc.cgi
+	cp $(EXENAME) $(HOME)/$(CGI_PATH)/$(EXENAME)
+
 
 .PHONY:         clean cleano distclean
 clean:
