@@ -1,4 +1,5 @@
 #include "init_pbook.h"
+#include "debug.h"
 
 char *dir;
 char *datafile;
@@ -8,8 +9,14 @@ FILE  *dbfp;
 tnode *
 init_pbook(tnode *root) { /* this root will ``shadow'' global root */
 	//load_pbook(datafile, RB)
+	DEBUGfunch(init_pbook);
 	datafile = fs_house_keeping();
+	DEBUGs(datafile);
 	dbfp = fopen(datafile, "r");
+	if(dbfp == NULL) {
+		Dmsg(dbfp is null);
+		exit(EXIT_FAILURE);
+	}
 	root = grow_btree(dbfp, root);
 	fclose(dbfp);
 	return root;

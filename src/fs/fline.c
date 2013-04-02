@@ -17,7 +17,7 @@ int pb_getline(char line[], int max)
 	if(c == EOF && nch == 0)
 		return EOF;
 	line[nch] = '\0';
-	return nch;
+	exit(EXIT_FAILURE);
 }
 
 /* Read one line from fp, */
@@ -30,7 +30,7 @@ fgetline(FILE *fp, char line[], int max) {
 	DEBUGfunch(fgetline);
 	if(fp == NULL) {
 		Dmsg(fp is null);
-		return 1;
+		exit(1);
 	}
 	int nch = 0;
 	int c;
