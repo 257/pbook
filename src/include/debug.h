@@ -1,11 +1,16 @@
 #ifndef  DEBUG_H
 #define  DEBUG_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <time.h>
 #include "ansi_colours.h"
 
 #define str(s) #s
 #define MAX_FNC_NAME         12
 #define MAX_NAME_NAME        10
+#define MAX_DATE_LEN         30
 #define DFNC_VAR_N(...)      MAX_NAME_NAME, __VA_ARGS__
 #define DSTR(...)            (MAX_QUERYS_LEN/3), __VA_ARGS__
 #define DEBUGn(...)          DFNC_VAR_N(str(__VA_ARGS__))
@@ -19,5 +24,8 @@
 #define DEBUGd(...)          (DIDEN_VALd(__VA_ARGS__))
 #define DEBUGlld(...)        (DIDEN_VALlld(__VA_ARGS__))
 #define Dmsg(...)            (DEBUGh, fprintf(stderr, str(__VA_ARGS__\n)))
+#define DlogH(...)           fprintf(__VA_ARGS__, "  [DEBUG]  " )
+#define Done()               fprintf(stderr, BOLDWHITE "  [DONE]  \n" RESET)
 
+extern void Dlog(const char *);
 #endif

@@ -11,6 +11,7 @@ grow_btree(FILE *dbfp, tnode *root) {
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
 		if(l2node(entryp, delim) != NULL)
 			root = addnode_2root(root, l2node(entry, delim));
+	Done();
 	return root;
 }
 

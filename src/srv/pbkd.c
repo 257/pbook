@@ -5,13 +5,13 @@
 /* backgroud mode, needs signal(), no time sorry */
 void
 pbkd(int mode) {
-	//int c;
-	// static int s2;
+	DEBUGfunch(pbkd);
+	Done();
 	switch (mode) {
 		case START:
-			Dmsg(send EOF with Ctrl-D to stop pbd);
 			//while ((c = getchar()) != EOF) {
 				Dmsg(started pbd in foreground mode);
+				Dmsg(calling recv_send_2pbk_skt);
 				recv_send_2pbk_skt();
 			//}
 			Dmsg(caught EOF closing pbd);

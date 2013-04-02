@@ -15,6 +15,8 @@ mk_socket() {
 
 void
 recv_send_2pbk_skt() {
+	DEBUGfunch(recv_send_2pbk_skt);
+	Done();
 	int len;
 	socklen_t t;
 	struct sockaddr_un local, remote;
@@ -22,7 +24,9 @@ recv_send_2pbk_skt() {
 	char *bufp = buf;
 	int s;
 
+	Dmsg(creating the socket);
 	s = mk_socket();
+	Done();
 	
 	local.sun_family = AF_UNIX;
 	strcpy(local.sun_path, SOCK_PATH);
@@ -61,27 +65,30 @@ recv_send_2pbk_skt() {
 			exit(1);
 		}
 		Dmsg(Connected.);
+		int c;
 		done = 0;
 		do {
 			DEBUGfunch(recv());
-			n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
-			bufp[n] = '\0';
-			DEBUGs(bufp);
-			if (n <= 0) {
-				if (n < 0) perror("recv");
-				done = 1;
-			}
-			if (!done) {
-				if (parse_op(bufp) == NONE) {
-					char none[] = "0";
-					char *nonep = none;
-					strcpy(bufp, nonep);
-				}
-				DEBUGfunch(send());
+			while((c = getchar()) != EOF) {
+				n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
+				bufp[n] = '\0';
 				DEBUGs(bufp);
-				if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
-					perror("send");
+				if (n <= 0) {
+					if (n < 0) perror("recv");
 					done = 1;
+				}
+				if (!done) {
+					if (parse_op(bufp) == NONE) {
+						char none[] = "0";
+						char *nonep = none;
+						strcpy(bufp, nonep);
+					}
+					DEBUGfunch(send());
+					DEBUGs(bufp);
+					if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
+						perror("send");
+						done = 1;
+					}
 				}
 			}
 		} while (!done);

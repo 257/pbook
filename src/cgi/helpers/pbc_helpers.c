@@ -33,13 +33,18 @@ isfield(char *input, int field) {
 
 void
 parse_up(char *qstrp, char *up, char *phonc, char *name, char *last) {
-	char noalice[]    = "Alice doesn't live here anymore!\n";
+	Dlog("parse_up");
+	char noalice[]   = "Alice doesn't live here anymore!\n";
 	char havealice[] = "now lives here\n";
 	char upalice[]   = "up2date\n";
-	int upbit = waz(up);
-	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
+	int upbit = UPDATE;
+	if (phonc == NULL) {
+		Dlog("phoc is null");
+		upbit = LOOKUP;
+	}
 	char buf[MAX_QUERYS_LEN] = {0};
 	char *bufp = buf;
+	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
 	send_recv_2pbk_skt(qstrp, bufp);
 	switch (upbit) {
 		case LOOKUP:
@@ -70,10 +75,16 @@ waz(char *up) {
 }
 
 char *
-mk_btreel(char *l, char *delim, const int op, const char *phon, const char *name, const char *last) {
+mk_btreel(char *l, char *delim, int op, char *phon, char *name, char *last) {
+	Dlog("mk_btreel");
+	char myphon[] = "5143169147";
+	char *myphonp = myphon;
 	switch (op) {
 		case LOOKUP:
-			l = strcpy(l, "1");
+			l    = strcpy(l, "1");
+			Dlog("LOOKUP");
+			phon = myphonp; 
+			Dlog(phon);
 			break;
 		case UPDATE:
 			l = strcpy(l, "3");

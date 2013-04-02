@@ -19,6 +19,7 @@ objects       = \
 		sktc.o \
 		htmlf.o \
 		xctod.o \
+		debug.o \
 		pbc_helpers.o
 
 EXENAME        = pbkc.cgi
