@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
+#include <ctype.h>
 
 #define MAXLINE 100
 #define MAXROWS 10
@@ -9,6 +11,35 @@
 /* copying it to line array (but no more than max chars). */
 /* Does not place terminating \n in line array. */
 /* Returns line length, or 0 for empty line, or EOF for end-of-file. */
+
+int
+getwords(char *line, char *words[], int maxwords)
+{
+char *p = line;
+int nwords = 0;
+
+while(1)
+	{
+	while(isspace(*p))
+		p++;
+
+	if(*p == '\0')
+		return nwords;
+
+	words[nwords++] = p;
+
+	while(!isspace(*p) && *p != '\0')
+		p++;
+
+	if(*p == '\0')
+		return nwords;
+
+	*p++ = '\0';
+
+	if(nwords >= maxwords)
+		return nwords;
+	}
+}
 
 int fgetline(FILE *fp, char line[], int max)
 {
@@ -45,6 +76,7 @@ int nrows = 0;
 int n;
 int i;
 
+int
 main() {
 ifp = fopen(filename, "r");
 if(ifp == NULL)
@@ -67,4 +99,5 @@ while(fgetline(ifp, line, MAXLINE) != EOF)
 		array[nrows][i] = atoi(words[i]);
 	nrows++;
 	}
+return 0;
 }
