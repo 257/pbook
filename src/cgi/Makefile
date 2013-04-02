@@ -22,7 +22,7 @@ objects       = \
 		pbc_helpers.o
 
 EXENAME        = pbkc
-pbkc:           $(objects)
+pbkc.cgi:           $(objects)
 	cc -o $@ $(objects) && $(MAKE) -C . cleano
 	
 	
