@@ -7,9 +7,8 @@ tnode *
 grow_btree(FILE *dbfp, tnode *root) {
 	DEBUGfunch(grow_btree);
 	char entry[MAX_ENTL];
-	char *entryp;
 	while (fgetline(dbfp, entry, MAX_ENTL) != EOF)
-		if(l2node(entryp, delim) != NULL)
+		if(l2node(entry, delim) != NULL)
 			root = addnode_2root(root, l2node(entry, delim));
 	Done();
 	return root;
@@ -341,15 +340,17 @@ mk_node(tnode *node, int op, int count, long long ph, char *n, char *l)  {
 	return node;
 }
 
-char *strdup(char *s)         /* make a duplicate of s */
+/*
+char *strdup(char *s)
 {
      char *p;
 
-      p = (char *) malloc(strlen(s)+1); /* +1 for '\0' */
+      p = (char *) malloc(strlen(s)+1);
       if (p != NULL)
           strcpy(p, s);
       return p;
 }
+*/
 
 /* talloc: make a tnode */
 tnode *

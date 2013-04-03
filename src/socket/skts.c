@@ -13,6 +13,39 @@ mk_socket() {
 	return s;
 }
 
+int
+read_from_client(int filedes) {
+	char buf[MAX_QUERYS_LEN] = {0};
+	char *bufp = buf;
+	int nbytes;
+	DEBUGfunch(read());
+	nbytes = read (filedes, buf, MAX_QUERYS_LEN);
+	// nbytes = recv(filedes, bufffer, MAX_QUERYS_LEN, 0);
+	// bufp[n] = '\0';
+	if (nbytes < 0) {
+	   /* Read error. */
+	   perror ("read");
+	   exit (EXIT_FAILURE);
+	}
+	else if (nbytes == 0)
+	 /* End-of-file. */
+	 return -1;
+	else {
+		DEBUGs(bufp);
+		if (parse_op(bufp) == NONE) {
+			char none[] = "0";
+			char *nonep = none;
+			strcpy(bufp, nonep);
+		}
+		DEBUGfunch(send());
+		DEBUGs(bufp);
+		if (send(filedes, bufp, (strlen(bufp)+1), 0) < 0) {
+			perror("send");
+		}
+		return 0;
+	}
+}
+
 void
 recv_send_2pbk_skt() {
 	DEBUGfunch(recv_send_2pbk_skt);
@@ -20,11 +53,9 @@ recv_send_2pbk_skt() {
 	int len;
 	size_t size;
 	struct sockaddr_un local, pbkc;
-	char buf[MAX_QUERYS_LEN] = {0};
-	char *bufp = buf;
 	int sock;
 
-	fd_set active_fd_set, read_fd_set;
+	fd_set active_fd_set, read_fd_set, write_fd_set;
 
 	Dmsg(creating the socket);
 	sock = mk_socket();
@@ -35,88 +66,68 @@ recv_send_2pbk_skt() {
 	unlink(local.sun_path);
 	len = strlen(local.sun_path) + sizeof(local.sun_family);
 
-	if (bind(s, (struct sockaddr *)&local, len) == -1) {
+	if (bind(sock, (struct sockaddr *)&local, len) == -1) {
 		perror("bind");
 		exit(1);
 	}
 
-	if (listen(s, MAX_Q_LEN) == -1) {
+	if (listen(sock, MAX_Q_LEN) == -1) {
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
 	/* Initialize the set of active sockets. */
 	FD_ZERO (&active_fd_set);
-	FD_SET (stdin, &active_fd_set);
-	FD_SET (pbkc, &active_fd_set);
-	int c;
+	int stdinfd = fileno(stdin);
+	FD_SET (stdinfd, &active_fd_set);
+	FD_SET (sock, &active_fd_set);
 
-	int done, n, s2;
-	Dmsg(send 'EOF' with Ctrl-D to stop the daemon or);
-	Dmsg(Press any other key to continue);
-
-	while(1) {
-		//if (((s2 = accept(s, (struct sockaddr *)&pbkc, &t)) == -1))
-		read_fd_set = active_fd_set;
-		Dmsg(Waiting for a connection...);
-		/* Block until input arrives on one or more active sockets. */
-		if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
-			perror ("select");
-			exit (EXIT_FAILURE);
-		}
-		/* Service all the sockets with input pending. */
-		for (i = 0; i < FD_SETSIZE; ++i)
-			if (FD_ISSET (i, &read_fd_set)) {
-				if (i == pbkc) {
-					/* Connection request on original socket. */
-					int new;
-					size = sizeof(pbkc);
-					new = accept (sock,
-							(struct sockaddr *) &pbkc,
-							&size);
-					if (new < 0) {
-						perror ("accept");
-						exit (EXIT_FAILURE);
-					}
-					Dmsg(Connected.);
-					FD_SET (new, &active_fd_set);
-
-					done = 0;
-					do {
-						DEBUGfunch(recv());
-						n = recv(s2, bufp, MAX_QUERYS_LEN, 0);
-						bufp[n] = '\0';
-						DEBUGs(bufp);
-						if (n <= 0) {
-							if (n < 0) perror("recv");
-							done = 1;
-						}
-						if (!done) {
-							if (parse_op(bufp) == NONE) {
-								char none[] = "0";
-								char *nonep = none;
-								strcpy(bufp, nonep);
-							}
-							DEBUGfunch(send());
-							DEBUGs(bufp);
-							if (send(s2, bufp, (strlen(bufp)+1), 0) < 0) {
-								perror("send");
-								done = 1;
-							}
-						}
-					} while (!done);
-				} else {
-					/* Data arriving on an already-connected socket. */
-					if (read_from_client (i) < 0) {
-						close (i);
-						FD_CLR (i, &active_fd_set);
-					}
-				}
-			}
+	FD_ZERO (&write_fd_set);
+	FD_SET (sock, &write_fd_set);
+	Dmsg(send "EOF" with Ctrl-D to stop the daemon or);
+	//Dmsg(Press any other key to continue);
+	//if (((s2 = accept(s, (struct sockaddr *)&pbkc, &t)) == -1))
+	read_fd_set = active_fd_set;
+	Dmsg(Waiting for a connection...);
+	/* Block until input arrives on one or more active sockets. */
+	int sig = START;
+	while(sig != EOF) {
+	if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
+		perror ("select");
+		exit (EXIT_FAILURE);
 	}
-
-		perror("accept");
-		exit(1);
-	close(s2);
+	/* Service all the sockets with input pending. */
+	int i;
+	for (i = 0; i < FD_SETSIZE; ++i)
+		if (FD_ISSET (i, &read_fd_set)) {
+			if (i == sock) {
+				/* Connection request on original socket. */
+				int new;
+				size = sizeof(pbkc);
+				new = accept (sock,
+						(struct sockaddr *) &pbkc,
+						&size);
+				if (new < 0) {
+					perror ("accept");
+					exit (EXIT_FAILURE);
+				}
+				Dmsg(Connected.);
+				if (read_from_client (i) < 0) {
+					close (i);
+					FD_SET (new, &active_fd_set);
+				}
+			} else if (i == stdinfd) {
+				/* Data arriving on stdin. */
+				int c;
+				if((c=getc(stdin)) == EOF) {
+					close(sock);
+					i   = FD_SETSIZE;
+					sig = EOF;
+				}
+				else
+					i = 0;
+			}
+		}
+	}
 }
 
 // TODO: this doesn't belong here

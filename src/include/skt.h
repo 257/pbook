@@ -1,5 +1,5 @@
-#ifndef PBK_SKTS_H
-#define PBK_SKTS_H
+#ifndef PBK_SKT_H
+#define PBK_SKT_H
 
 #include <string.h>
 #include <sys/types.h>

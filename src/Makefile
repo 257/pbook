@@ -9,9 +9,11 @@ modules       += :main
 
 MAKEFLAGS      = --no-print-directory
 PREFIX        := $(PWD)
-CSTD           = c99
+# no fd in c99 and we
+# need it for unix sockets
+CSTD           = c99 \
+		 -std=$(CSTD)
 CFLAGS         = -I$(include_dirs) \
-		 -std=$(CSTD) \
 		 -g \
 		 -Wall
 EXENAME       = pbook
