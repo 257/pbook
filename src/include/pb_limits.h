@@ -18,7 +18,7 @@ extern unsigned short int   isop(long long);
 /*#define isop(...)   ((__VA_ARGS__ <= NONE) || (BOP <= __VA_ARGS__)) ? NONE : __VA_ARGS__ 
  */
 
-extern unsigned short int  isphon(long long);
+//extern unsigned short int  isphon(long long);
 /*
  * #define isphon(...)   ((__VA_ARGS__ <= F_PHON) || (S_PHON <= __VA_ARGS__)) ? NONE : __VA_ARGS__ 
  */

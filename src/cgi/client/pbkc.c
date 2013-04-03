@@ -30,12 +30,10 @@ main()
 	last  = cgigetval("last");
 	phonc = cgigetval("phon");
 
-	/*
 	up             = "LOOKUP";
 	name           = "qui";
 	last           = "qoo";
 	phonc          = "1011111111";
-	*/
 
 	/* TODO: what is this? wrap this away */
 	if ((!isfield(up, OP) || !isfield(name, NAME) || !isfield(last, LAST)))

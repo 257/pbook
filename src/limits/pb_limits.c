@@ -8,10 +8,14 @@ isop(long long op) {
 		return 0;
 }
 
+/*
 unsigned short int
 isphon(long long phon) {
-	if ((F_PHON <= phon) && (phon <= S_PHON))
+
+
+	if ((S_PHON <= phon) && (phon <= 1000000000))
 		return 1;
 	else
 		return 0;
 }
+*/

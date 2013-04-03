@@ -17,45 +17,44 @@ grow_btree(FILE *dbfp, tnode *root) {
 tnode *
 l2node(char *l, char *delim) {
 	tnode *node = NULL;
-	long long phon = NONE;
+	char *phon;
 	char *name;
 	char *last;
 	char *tokenp;
 	int i  = OP;
 	int op = NONE;
+	int hasop = 0;
+	if(l[1] == ':') {
+		Dmsg(hasop);
+		DEBUGd(l[1]);
+		op = l[0];
+		hasop = 1;
+	}
 	if (isdigit(l[0])) {
 		for(tokenp = strtok(l, delim);
 				tokenp != NULL && i <= LAST;
 				i++, tokenp = strtok(NULL, delim)) {
 			switch (i) {
 				case OP:
-					phon = atoll(tokenp);
-					if (isphon(phon)) {
-						op   = NONE;
-						i    = PHON;
-					} else {
-						op = tokenp[0] - '0';
+					if(hasop == 0) {
+						phon = tokenp;
+						i = PHON;
 					}
 					break;
 				case PHON:
-					phon = atoll(tokenp);
-					if (isphon(phon)) {
-						;
-					}
+					phon = tokenp;
+					break;
 				case NAME:
-					//strcpy(name, tokenp);
 					name = tokenp;
 					break;
 				case NAME_PHON:
 				case LAST:
-					// strcpy(last, tokenp);
 					last = tokenp;
 					break;
 				default:
 					break;
 			}
 		}
-		/* TODO: TOASK: is the cast here called for? */
 		node = mk_node(node, op, NONE, phon, name, last);
  
 	}
@@ -108,6 +107,7 @@ ins_node(tnode *root, tnode *node) {
 	} else {
 		Dmsg(found a match updating);
 		(*place_in_tree)->phon = node->phon;
+		strcpy((*place_in_tree)->phon, node->phon);
 		insbit  = UPDATE;
 	}
 	return insbit;
@@ -196,7 +196,7 @@ nodef_print(tnode *node, char *nodef, int prm) {
 			nodef = itoa(node->op, nodef, 10);
 			break;
 		case PHON:
-			nodef = itoa(node->phon, nodef, 10);
+			nodef = node->phon;
 			break;
 		case NAME:
 			nodef = node->name;
@@ -329,19 +329,18 @@ char *itoa(long long value, char *digits, int base)
 }
 
 tnode *
-mk_node(tnode *node, int op, int count, long long ph, char *n, char *l)  {
+mk_node(tnode *node, int op, int count, char *ph, char *n, char *l)  {
 	node         = talloc();
 	node->op     = op;
-	node->phon   = ph; /* we don't care about BPHN, caller's job */
 	node->count  = count;
 	node->left   = node->right = NULL;
+	(ph != NULL) ? (node->phon = strdup(ph)) : (node->phon = ph)   ;
 	(n  != NULL) ? (node->name = strdup(n))  : (node->name = n)    ;
 	(l  != NULL) ? (node->last = strdup(l))  : (node->last = l)    ;
 	return node;
 }
 
-/*
-char *strdup(char *s)
+char *kr_strdup(char *s)
 {
      char *p;
 
@@ -350,7 +349,6 @@ char *strdup(char *s)
           strcpy(p, s);
       return p;
 }
-*/
 
 /* talloc: make a tnode */
 tnode *

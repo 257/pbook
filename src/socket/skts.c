@@ -20,8 +20,9 @@ read_from_client(int filedes) {
 	int nbytes;
 	DEBUGfunch(read());
 	nbytes = read (filedes, buf, MAX_QUERYS_LEN);
-	// nbytes = recv(filedes, bufffer, MAX_QUERYS_LEN, 0);
-	// bufp[n] = '\0';
+	//DEBUGfunch(recv());
+	//nbytes = recv(filedes, bufp, MAX_QUERYS_LEN, 0);
+	bufp[nbytes] = '\0';
 	if (nbytes < 0) {
 	   /* Read error. */
 	   perror ("read");
@@ -89,15 +90,14 @@ recv_send_2pbk_skt() {
 	read_fd_set = active_fd_set;
 	Dmsg(Waiting for a connection...);
 	/* Block until input arrives on one or more active sockets. */
-	int sig = START;
-	while(sig != EOF) {
+	//int sig = START;
+	int i;
+	for (i = 0; i < FD_SETSIZE; ++i) {
 	if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
 		perror ("select");
 		exit (EXIT_FAILURE);
 	}
 	/* Service all the sockets with input pending. */
-	int i;
-	for (i = 0; i < FD_SETSIZE; ++i)
 		if (FD_ISSET (i, &read_fd_set)) {
 			if (i == sock) {
 				/* Connection request on original socket. */
@@ -111,17 +111,17 @@ recv_send_2pbk_skt() {
 					exit (EXIT_FAILURE);
 				}
 				Dmsg(Connected.);
-				if (read_from_client (i) < 0) {
-					close (i);
+				if (read_from_client (new) < 0) {
+					Dmsg(read_from_client<zero);
 					FD_SET (new, &active_fd_set);
 				}
 			} else if (i == stdinfd) {
 				/* Data arriving on stdin. */
 				int c;
-				if((c=getc(stdin)) == EOF) {
+				if((c=getchar()) == EOF) {
 					close(sock);
 					i   = FD_SETSIZE;
-					sig = EOF;
+					//sig = EOF;
 				}
 				else
 					i = 0;

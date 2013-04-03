@@ -41,7 +41,7 @@ struct tnode {                    /* the tree node: */
 	unsigned int op;          /* operation directive */
 	char *name;               
 	char *last;
-	long long phon;
+	char *phon;
 	int count;                /* number of occurrences */
 	tnode *left;              /* left child */
 	tnode *parent;            /* parent for proper deletion but notime */
@@ -55,7 +55,7 @@ extern void          ugrow_btree(tnode *, FILE *);
 extern tnode        *talloc(void);
 extern tnode        *addnode_2root(tnode *, tnode *);
 extern int           ins_node(tnode *, tnode *);
-extern tnode        *mk_node(tnode *, int op, int count, long long ph, char *n, char *l);
+extern tnode        *mk_node(tnode *, int op, int count, char *ph, char *n, char *l);
 extern tnode        **lookup(tnode *, tnode *);
 extern int           fgetline(FILE *fp, char line[], int max);
 extern void          treeprint(tnode *, int);
