@@ -3,20 +3,10 @@
 
 #include "debug.h"
 #include "node_print.h"
-#include "pb_limits.h"
 #include "btree.h"
 #include "sktc.h"
-#include "ansi_colours.h"
+#include "node_print.h"
+#include "debug.h"
 
-#define str(s) #s
-
-
-
-
-enum boolean { FALSE, TRUE };
-extern int   isfield(char *, int);
-extern char *mk_btreel(char *l, char *delim, int op, char *phon, char *name, char *last);
-extern void  parse_up(char *, char *up, char *phonc, char *name, char *last);
-extern int   waz(char *);
 
 #endif

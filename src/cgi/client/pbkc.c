@@ -6,7 +6,6 @@
 #include "cgigetval.h"
 #include "html.h"
 
-#include "ansi_colours.h"
 #include "pbc_helpers.h"
 #include "debug.h"
 
@@ -19,7 +18,7 @@ main()
 	char *up    = NULL;
 	char *name  = NULL;
 	char *last  = NULL;
-	char *phonc = NULL;
+	char *phon = NULL;
 
 	char qstr[MAX_QUERYS_LEN] = {0};
 	char *qstrp;
@@ -28,23 +27,17 @@ main()
 	up    = cgigetval("op");
 	name  = cgigetval("name");
 	last  = cgigetval("last");
-	phonc = cgigetval("phon");
+	phon = cgigetval("phon");
 
 	/*
 	up             = "LOOKUP";
 	name           = "qui";
 	last           = "qoo";
-	phonc          = "1011111111";
+	phon          = "1011111111";
 	*/
-
-	/* TODO: what is this? wrap this away */
-	/*
-	if ((!isfield(up, OP) || !isfield(name, NAME) || !isfield(last, LAST)))
-		goto footer;
-		*/
-	Dlog("calling parse_up");
-	parse_up(qstrp, up, phonc, name, last);
-//footer:
+	
+	parse_up(qstrp, up, phon, name, last);
 	html_footer();
+	Dlog("after footer");
 	return 0;
 }
