@@ -87,16 +87,20 @@ recv_send_2pbk_skt() {
 	Dmsg(send "EOF" with Ctrl-D to stop the daemon or);
 	//Dmsg(Press any other key to continue);
 	//if (((s2 = accept(s, (struct sockaddr *)&pbkc, &t)) == -1))
-	read_fd_set = active_fd_set;
 	Dmsg(Waiting for a connection...);
 	/* Block until input arrives on one or more active sockets. */
-	//int sig = START;
 	int i;
-	for (i = 0; i < FD_SETSIZE; ++i) {
+
+	Dmsg(selecting the set);
+
+	int sig = START;
+	while(sig != KILL) {
+	read_fd_set = active_fd_set;
 	if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0) {
 		perror ("select");
 		exit (EXIT_FAILURE);
 	}
+	for (i = 0; i < FD_SETSIZE; ++i) {
 	/* Service all the sockets with input pending. */
 		if (FD_ISSET (i, &read_fd_set)) {
 			if (i == sock) {
@@ -111,22 +115,22 @@ recv_send_2pbk_skt() {
 					exit (EXIT_FAILURE);
 				}
 				Dmsg(Connected.);
-				if (read_from_client (new) < 0) {
-					Dmsg(read_from_client<zero);
-					FD_SET (new, &active_fd_set);
-				}
-			} else if (i == stdinfd) {
+				read_from_client (new);
+				Dmsg(read_from_client<zero);
+				FD_SET (new, &active_fd_set);
+			}
+			else if (i == stdinfd) {
 				/* Data arriving on stdin. */
+				Dmsg(not sock);
 				int c;
+				//if(read_from_client < 0) {
 				if((c=getchar()) == EOF) {
 					close(sock);
-					i   = FD_SETSIZE;
-					//sig = EOF;
+					sig = KILL;
 				}
-				else
-					i = 0;
 			}
 		}
+	}
 	}
 }
 
