@@ -116,7 +116,6 @@ recv_send_2pbk_skt() {
 				}
 				Dmsg(Connected.);
 				read_from_client (new);
-				Dmsg(read_from_client<zero);
 				FD_SET (new, &active_fd_set);
 			}
 			else if (i == stdinfd) {
@@ -142,10 +141,11 @@ parse_op(char *bufp) {
 	tnode **qnp = NULL;
 
 	qn = l2node(bufp, delim);
+	DEBUGfunch(parse_op);
 	switch (qn->op) {
 		case LOOKUP:
 			if ((*(qnp = lookup(root, qn))) != NULL)
-				bufp = nodef_print((*qnp), bufp, PHON);
+				strcpy(bufp, (*qnp)->phon);
 			else
 				insbit = NONE;
 			break;

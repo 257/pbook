@@ -26,8 +26,6 @@ l2node(char *l, char *delim) {
 	int hasop = 0;
 	if(l[1] == ':') {
 		Dmsg(hasop);
-		DEBUGd(l[1]);
-		op = l[0];
 		hasop = 1;
 	}
 	if (isdigit(l[0])) {
@@ -39,6 +37,9 @@ l2node(char *l, char *delim) {
 					if(hasop == 0) {
 						phon = tokenp;
 						i = PHON;
+					} else {
+						op = atoi(tokenp);
+						DEBUGd(op);
 					}
 					break;
 				case PHON:
@@ -56,7 +57,6 @@ l2node(char *l, char *delim) {
 			}
 		}
 		node = mk_node(node, op, NONE, phon, name, last);
- 
 	}
 	return  node;
 }

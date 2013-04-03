@@ -1,6 +1,6 @@
 #include "pbc_helpers.h"
 #include "node_print.h"
-
+/*
 int
 isfield(char *input, int field) {
 	int ret = TRUE;
@@ -30,6 +30,7 @@ isfield(char *input, int field) {
 	}
 	return ret;
 }
+*/
 
 void
 parse_up(char *qstrp, char *up, char *phonc, char *name, char *last) {
@@ -38,10 +39,19 @@ parse_up(char *qstrp, char *up, char *phonc, char *name, char *last) {
 	char havealice[] = "now lives here\n";
 	char upalice[]   = "up2date\n";
 	int upbit = UPDATE;
+	DEBUGfunch(parse_up);
+	DEBUGd(upbit);
+	DEBUGd(LOOKUP);
+	/*
 	if (phonc == NULL) {
 		Dlog("phoc is null");
+		Dmsg(upbit should be set to 1 now);
 		upbit = LOOKUP;
+		DEBUGd(upbit);
 	}
+	*/
+	upbit = waz(up);
+	DEBUGd(upbit);
 	char buf[MAX_QUERYS_LEN] = {0};
 	char *bufp = buf;
 	qstrp = mk_btreel(qstrp, delim, upbit, phonc, name, last);
